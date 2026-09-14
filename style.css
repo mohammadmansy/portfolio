@@ -1035,6 +1035,18 @@ button, input, textarea {
   color: var(--text-muted);
 }
 
+.footer-link {
+  color: var(--accent-purple);
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+
+.footer-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ============================================
    Scroll Reveal Animation
    ============================================ */
