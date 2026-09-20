@@ -3,19 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mohamed Mansy — Unity Game Developer</title>
-  <meta name="description" content="Portfolio of Mohamed Mansy, a Unity Game Developer crafting immersive 2D/3D gameplay experiences." />
+  <title>Mohamed Mansy — Unity &amp; VR Developer</title>
+  <meta name="description" content="Portfolio of Mohamed Mansy, Unity & VR developer — 2D/3D games, AR/VR on Meta Quest & OpenXR, and game development instructor." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a href="#home" class="nav-logo">
-        <span class="logo-bracket">&lt;</span>Mohamed Mansy<span class="logo-bracket"> /&gt;</span>
-      </a>
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">Mohamed Mansy</a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#home" class="nav-link active">Home</a></li>
         <li><a href="#projects" class="nav-link">Projects</a></li>
@@ -23,7 +21,7 @@
         <li><a href="#experience" class="nav-link">Experience</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
       </ul>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
         <span></span>
         <span></span>
         <span></span>
@@ -32,147 +30,108 @@
   </nav>
 
   <section class="hero" id="home">
-    <div class="hero-bg-grid"></div>
-    <div class="hero-glow hero-glow-1"></div>
-    <div class="hero-glow hero-glow-2"></div>
-    <div class="hero-container">
-      <div class="hero-badge">Unity &amp; VR Developer | Game Instructor</div>
-      <h1 class="hero-title">
-        <span class="hero-title-line">Mohamed Mansy</span>
-        <span class="hero-title-divider">&mdash;</span>
-        <span class="hero-title-line hero-title-accent">Unity &amp; VR Developer</span>
-      </h1>
-      <p class="hero-subtitle">
-        Dedicated Unity &amp; VR Developer with 2 years of hands-on experience crafting interactive games and immersive experiences — from Meta Quest &amp; OpenXR to 2D/3D game development.
+    <div class="container">
+      <p class="hero-eyebrow">Unity &middot; VR &middot; Game Developer</p>
+      <h1 class="hero-name">Mohamed Mansy</h1>
+      <p class="hero-lead">
+        I build games and interactive experiences with Unity and C# &mdash; 2D and 3D titles, AR/VR
+        prototypes for Meta Quest and OpenXR &mdash; and I teach game development at 3C Coding School.
       </p>
-      <div class="hero-cta">
-        <a href="#projects" class="btn btn-primary">
-          <span class="btn-shine"></span>
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Explore My Games
-        </a>
-        <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-          View My GitHub
-        </a>
-        <a href="cv/Mohamed_Mansy_FlowCV_Resume_2026-08-16.pdf" download class="btn btn-secondary">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download CV
-        </a>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">View projects</a>
+        <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-outline">GitHub</a>
       </div>
-      <div class="hero-scroll-hint">
-        <span>Scroll</span>
-        <div class="scroll-line"></div>
-      </div>
+      <p class="hero-cv">
+        <a href="cv/Mohamed_Mansy_FlowCV_Resume_2026-08-16.pdf" download>Download CV (PDF)</a>
+      </p>
     </div>
   </section>
 
   <section class="projects" id="projects">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-tag">// Featured Projects</span>
-        <h2 class="section-title">Games I've Built</h2>
-        <p class="section-subtitle">A curated selection of projects showcasing gameplay programming, optimization, and creative design.</p>
-      </div>
+    <div class="container">
+      <header class="section-head">
+        <p class="section-kicker">Featured work</p>
+        <h2 class="section-title">Projects</h2>
+      </header>
 
-      <div class="portfolio-disclaimer">
-        <svg class="disclaimer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <p>This is a curated showcase of selected works. For a complete list of projects with detailed descriptions, please refer to my <a href="cv/Mohamed_Mansy_CV.pdf" download>full CV</a>.</p>
-      </div>
+      <p class="projects-note">
+        A curated selection of work. For a full list of projects, see my
+        <a href="cv/Mohamed_Mansy_FlowCV_Resume_2026-08-16.pdf" download>CV</a>.
+      </p>
 
-      <div class="projects-grid">
-        <article class="project-card">
-          <div class="project-thumbnail">
-            <img src="https://placehold.co/800x450/1a1028/a855f7?text=Scan+the+Card&font=raleway" alt="Scan the Card - AR Educational Experience" loading="lazy" />
-            <div class="project-overlay">
-              <span class="genre-badge">AR Educational Experience</span>
-            </div>
+      <div class="projects-list">
+        <article class="project project-featured">
+          <div class="project-media">
+            <img src="https://placehold.co/1200x675/13161c/38bdf8?text=Scan+the+Card&font=inter" alt="Scan the Card — AR educational experience" loading="lazy" />
           </div>
-          <div class="project-body">
+          <div class="project-info">
+            <p class="project-meta">Augmented Reality</p>
             <h3 class="project-title">Scan the Card</h3>
-            <p class="project-description">
-              An augmented reality learning experience designed for children. Users scan physical cards to trigger interactive 3D content, blending real-world interaction with digital education. Built using image tracking and markerless AR techniques for a seamless, intuitive experience.
+            <p class="project-desc">
+              An AR learning experience for children. Pointing a device at a physical card triggers
+              interactive 3D content in real time, using image tracking to blend the physical and
+              digital worlds.
             </p>
-            <div class="project-tags">
-              <span class="tag">Unity Engine</span>
-              <span class="tag">C#</span>
-              <span class="tag">AR Foundation</span>
-              <span class="tag">Image Tracking</span>
-              <span class="tag">Scriptable Objects</span>
-            </div>
-            <div class="project-actions">
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                Play Demo
-              </a>
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                Source Code
-              </a>
+            <ul class="project-tech">
+              <li>Unity</li>
+              <li>C#</li>
+              <li>AR Foundation</li>
+              <li>Image Tracking</li>
+              <li>ScriptableObjects</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link-accent">Play demo</a>
+              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
             </div>
           </div>
         </article>
 
-        <article class="project-card">
-          <div class="project-thumbnail">
-            <img src="https://placehold.co/800x450/0f1923/22d3ee?text=Photobooth&font=raleway" alt="Photobooth - Interactive Photo App" loading="lazy" />
-            <div class="project-overlay">
-              <span class="genre-badge">Interactive App</span>
-            </div>
+        <article class="project">
+          <div class="project-media">
+            <img src="https://placehold.co/800x450/13161c/38bdf8?text=Photobooth&font=inter" alt="Photobooth — interactive photo app" loading="lazy" />
           </div>
-          <div class="project-body">
+          <div class="project-info">
+            <p class="project-meta">Interactive App</p>
             <h3 class="project-title">Photobooth</h3>
-            <p class="project-description">
-              A fun, interactive Unity application that captures and processes photos with real-time effects and filters. Built with a focus on smooth UI transitions and responsive user interactions. Leverages Observer Pattern for event-driven filter switching and an object pool for efficient frame capture management.
+            <p class="project-desc">
+              A Unity application that captures photos and applies real-time effects and filters.
+              Filter switching is event-driven (Observer pattern) and frame capture is managed
+              through an object pool.
             </p>
-            <div class="project-tags">
-              <span class="tag">Unity Engine</span>
-              <span class="tag">C#</span>
-              <span class="tag">UGUI</span>
-              <span class="tag">Observer Pattern</span>
-              <span class="tag">Object Pooling</span>
-            </div>
-            <div class="project-actions">
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                Play Demo
-              </a>
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                Source Code
-              </a>
+            <ul class="project-tech">
+              <li>Unity</li>
+              <li>C#</li>
+              <li>UGUI</li>
+              <li>Object Pooling</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link-accent">Play demo</a>
+              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
             </div>
           </div>
         </article>
 
-        <article class="project-card">
-          <div class="project-thumbnail">
-            <img src="https://placehold.co/800x450/1a1028/a855f7?text=Arcade+Collection&font=raleway" alt="Classic Arcade Collection" loading="lazy" />
-            <div class="project-overlay">
-              <span class="genre-badge">2D Arcade Games</span>
-            </div>
+        <article class="project">
+          <div class="project-media">
+            <img src="https://placehold.co/800x450/13161c/38bdf8?text=Arcade+Collection&font=inter" alt="Classic arcade collection" loading="lazy" />
           </div>
-          <div class="project-body">
+          <div class="project-info">
+            <p class="project-meta">2D Arcade</p>
             <h3 class="project-title">Classic Arcade Collection</h3>
-            <p class="project-description">
-              A series of polished arcade-style games including Snake, Breakout, Rat Runner, Bowling, Focus, Maze, HotPotato, and Simon Game. Each built with clean architecture, ScriptableObjects for config-driven design, and object pooling for zero-allocation runtime performance.
+            <p class="project-desc">
+              A set of arcade-style games &mdash; Snake, Breakout, Rat Runner, Bowling, Focus, Maze,
+              Hot Potato, Simon &mdash; each with clean architecture, config-driven data, and
+              zero-allocation runtime performance.
             </p>
-            <div class="project-tags">
-              <span class="tag">Unity Engine</span>
-              <span class="tag">C#</span>
-              <span class="tag">Object Pooling</span>
-              <span class="tag">Scriptable Objects</span>
-              <span class="tag">Clean Architecture</span>
-            </div>
-            <div class="project-actions">
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                View Projects
-              </a>
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                Source Code
-              </a>
+            <ul class="project-tech">
+              <li>Unity</li>
+              <li>C#</li>
+              <li>Object Pooling</li>
+              <li>ScriptableObjects</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link-accent">View projects</a>
+              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
             </div>
           </div>
         </article>
@@ -181,221 +140,168 @@
   </section>
 
   <section class="skills" id="skills">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-tag">// Technical Expertise</span>
-        <h2 class="section-title">Skills &amp; Tools</h2>
-        <p class="section-subtitle">Core competencies across gameplay programming, performance optimization, and visual polish.</p>
-      </div>
+    <div class="container">
+      <header class="section-head">
+        <p class="section-kicker">What I work with</p>
+        <h2 class="section-title">Skills</h2>
+      </header>
+
       <div class="skills-grid">
-        <div class="skill-category">
-          <div class="skill-category-header">
-            <div class="skill-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            </div>
-            <h3 class="skill-category-title">Gameplay &amp; Development</h3>
-          </div>
-          <div class="skill-badges">
-            <span class="skill-badge">Unity Engine 2D/3D</span>
-            <span class="skill-badge">C# &amp; OOP</span>
-            <span class="skill-badge">Game Mechanics</span>
-            <span class="skill-badge">Level Design</span>
-            <span class="skill-badge">Game Loop Architecture</span>
-            <span class="skill-badge">Player Interaction</span>
-          </div>
+        <div class="skill-group">
+          <h3 class="skill-group-title">Unity / Game Development</h3>
+          <ul class="skill-list">
+            <li>2D and 3D game development</li>
+            <li>Game mechanics &amp; level design</li>
+            <li>Game loop architecture</li>
+            <li>Player interaction systems</li>
+            <li>Unity UI (UGUI)</li>
+          </ul>
         </div>
-
-        <div class="skill-category">
-          <div class="skill-category-header">
-            <div class="skill-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-            </div>
-            <h3 class="skill-category-title">XR &amp; Optimization</h3>
-          </div>
-          <div class="skill-badges">
-            <span class="skill-badge">AR/VR Development</span>
-            <span class="skill-badge">Meta Quest</span>
-            <span class="skill-badge">OpenXR</span>
-            <span class="skill-badge">Debugging &amp; Optimization</span>
-            <span class="skill-badge">Performance Profiling</span>
-            <span class="skill-badge">QA &amp; Bug Fixing</span>
-          </div>
+        <div class="skill-group">
+          <h3 class="skill-group-title">Programming</h3>
+          <ul class="skill-list">
+            <li>C# &amp; object-oriented programming</li>
+            <li>Clean code &amp; design patterns</li>
+            <li>Debugging &amp; performance optimization</li>
+            <li>QA testing &amp; bug fixing</li>
+          </ul>
         </div>
-
-        <div class="skill-category">
-          <div class="skill-category-header">
-            <div class="skill-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            </div>
-            <h3 class="skill-category-title">UI &amp; Collaboration</h3>
-          </div>
-          <div class="skill-badges">
-            <span class="skill-badge">Unity UI / UGUI</span>
-            <span class="skill-badge">Interactive Systems</span>
-            <span class="skill-badge">Git &amp; GitHub</span>
-            <span class="skill-badge">Mentoring</span>
-            <span class="skill-badge">Problem Solving</span>
-            <span class="skill-badge">Clean Code</span>
-          </div>
+        <div class="skill-group">
+          <h3 class="skill-group-title">XR / VR</h3>
+          <ul class="skill-list">
+            <li>AR/VR experience design</li>
+            <li>Meta Quest</li>
+            <li>OpenXR</li>
+            <li>AR Foundation</li>
+          </ul>
+        </div>
+        <div class="skill-group">
+          <h3 class="skill-group-title">Tools / Workflow</h3>
+          <ul class="skill-list">
+            <li>Git &amp; GitHub</li>
+            <li>Unity Editor tooling</li>
+            <li>Mentoring &amp; lesson design</li>
+            <li>Problem solving</li>
+          </ul>
         </div>
       </div>
     </div>
   </section>
 
   <section class="experience" id="experience">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-tag">// Experience &amp; Education</span>
-        <h2 class="section-title">Where I've Worked &amp; Studied</h2>
-        <p class="section-subtitle">Professional experience in game development and education, backed by a strong academic foundation.</p>
-      </div>
-      <div class="experience-timeline">
-        <div class="experience-card">
-          <div class="experience-dot"></div>
-          <div class="experience-content">
-            <div class="experience-header">
-              <h3 class="experience-role">Unity Game Instructor</h3>
-              <span class="experience-date">Jan 2025 &ndash; Present</span>
-            </div>
-            <p class="experience-company">3C Coding School</p>
-            <ul class="experience-list">
-              <li>Designed and delivered practical lessons covering C#, game development fundamentals, and AR/VR integration with Meta Quest and OpenXR.</li>
-              <li>Mentored and guided students through Unity-based 2D and 3D game projects, focusing on gameplay implementation, clean code practices, and problem-solving.</li>
-            </ul>
+    <div class="container">
+      <header class="section-head">
+        <p class="section-kicker">Career &amp; education</p>
+        <h2 class="section-title">Experience</h2>
+      </header>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-head">
+            <h3 class="timeline-role">Unity Game Instructor</h3>
+            <span class="timeline-org">3C Coding School</span>
+            <span class="timeline-date">Jan 2025 &mdash; Present</span>
           </div>
+          <ul class="timeline-points">
+            <li>Designed and delivered practical lessons on C#, game development fundamentals, and AR/VR integration with Meta Quest and OpenXR.</li>
+            <li>Mentored students through Unity 2D and 3D projects, focusing on gameplay implementation, clean code, and problem solving.</li>
+          </ul>
         </div>
-        <div class="experience-card">
-          <div class="experience-dot"></div>
-          <div class="experience-content">
-            <div class="experience-header">
-              <h3 class="experience-role">Unity Game Development Intern</h3>
-              <span class="experience-date">2024</span>
-            </div>
-            <p class="experience-company">SanabelApps</p>
-            <ul class="experience-list">
-              <li>Contributed to the development and optimization of mobile games using Unity and C#, focusing on gameplay functionality and performance.</li>
-              <li>Implemented responsive UI and core gameplay logic based on design specifications, ensuring compatibility across different mobile devices.</li>
-              <li>Conducted QA testing, identified gameplay bugs, and collaborated on debugging issues to improve game stability and overall user experience.</li>
-            </ul>
+
+        <div class="timeline-item">
+          <div class="timeline-head">
+            <h3 class="timeline-role">Unity Game Development Intern</h3>
+            <span class="timeline-org">SanabelApps</span>
+            <span class="timeline-date">2024</span>
           </div>
+          <ul class="timeline-points">
+            <li>Contributed to development and optimization of mobile games, focusing on gameplay functionality and performance.</li>
+            <li>Implemented responsive UI and core gameplay logic per design specs, across multiple device targets.</li>
+            <li>Ran QA testing, identified bugs, and collaborated on fixes to improve game stability.</li>
+          </ul>
         </div>
-        <div class="experience-card">
-          <div class="experience-dot"></div>
-          <div class="experience-content">
-            <div class="experience-header">
-              <h3 class="experience-role">Personal Unity Game Projects</h3>
-              <span class="experience-date">Ongoing</span>
-            </div>
-            <p class="experience-company">Indie Game Development</p>
-            <ul class="experience-list">
-              <li>Developed and published multiple independent Unity game prototypes, implementing game loop architecture, gameplay mechanics, UI systems, and player interaction systems.</li>
-              <li>Applied C# best practices and Unity development principles to build, test, and continuously improve gameplay experiences.</li>
-            </ul>
+
+        <div class="timeline-item">
+          <div class="timeline-head">
+            <h3 class="timeline-role">Personal Unity Game Projects</h3>
+            <span class="timeline-org">Independent work</span>
+            <span class="timeline-date">Ongoing</span>
           </div>
+          <ul class="timeline-points">
+            <li>Developed and published multiple game prototypes &mdash; game loops, mechanics, UI, and player interactions.</li>
+            <li>Applied C# best practices and Unity principles to build, test, and iterate on gameplay.</li>
+          </ul>
         </div>
-        <div class="experience-card">
-          <div class="experience-dot experience-dot-green"></div>
-          <div class="experience-content">
-            <div class="experience-header">
-              <h3 class="experience-role">Bachelor of Science</h3>
-              <span class="experience-date experience-date-edu">2021</span>
-            </div>
-            <p class="experience-company">Faculty of Science, Helwan University</p>
-            <ul class="experience-list">
-              <li>Built a strong foundation in computer science, mathematics, and software engineering principles.</li>
-            </ul>
+
+        <div class="timeline-item">
+          <div class="timeline-head">
+            <h3 class="timeline-role">Bachelor of Science</h3>
+            <span class="timeline-org">Faculty of Science, Helwan University</span>
+            <span class="timeline-date">2021</span>
           </div>
+          <ul class="timeline-points">
+            <li>Foundation in computer science, mathematics, and software engineering.</li>
+          </ul>
         </div>
       </div>
     </div>
   </section>
 
   <section class="contact" id="contact">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-tag">// Get In Touch</span>
-        <h2 class="section-title">Contact Me</h2>
-        <p class="section-subtitle">Have a project idea or looking for a game developer? Let's connect.</p>
-      </div>
-      <div class="contact-grid">
+    <div class="container">
+      <header class="section-head">
+        <p class="section-kicker">Contact</p>
+        <h2 class="section-title">Get in touch</h2>
+      </header>
+
+      <div class="contact-layout">
         <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-          <input type="hidden" name="_subject" value="New portfolio message from Mohamed Mansy's website" />
-          <input type="hidden" name="_captcha" value="false" />
-          <div class="form-group">
+          <input type="hidden" name="_subject" value="New message from portfolio" />
+          <div class="field">
             <label for="name">Name</label>
             <input type="text" id="name" name="name" placeholder="Your name" required />
           </div>
-          <div class="form-group">
+          <div class="field">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="you@example.com" required />
           </div>
-          <div class="form-group">
+          <div class="field">
             <label for="message">Message</label>
-            <textarea id="message" name="message" rows="5" placeholder="Tell me about your project or idea..." required></textarea>
+            <textarea id="message" name="message" rows="5" placeholder="Tell me about your project or question." required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary btn-full">
-            <span class="btn-shine"></span>
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Send Message
-          </button>
-          <div class="form-status" id="formStatus"></div>
+          <button type="submit" class="btn btn-primary btn-full">Send message</button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
 
-        <div class="contact-links">
-          <h3 class="contact-links-title">Find me on</h3>
-          <div class="social-cards">
-            <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="social-card">
-              <div class="social-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-              </div>
-              <div class="social-info">
-                <span class="social-name">GitHub</span>
-                <span class="social-handle">@mohammadmansy</span>
-              </div>
-              <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <aside class="contact-channel">
+          <h3 class="channel-title">Elsewhere</h3>
+          <div class="channel-list">
+            <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="channel-row">
+              <span class="channel-label">GitHub</span>
+              <span class="channel-value">github.com/mohammadmansy</span>
             </a>
-            <a href="https://linkedin.com/in/mohammedmansy" target="_blank" rel="noopener noreferrer" class="social-card">
-              <div class="social-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-              </div>
-              <div class="social-info">
-                <span class="social-name">LinkedIn</span>
-                <span class="social-handle">@mohammedmansy</span>
-              </div>
-              <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <a href="https://linkedin.com/in/mohammedmansy" target="_blank" rel="noopener noreferrer" class="channel-row">
+              <span class="channel-label">LinkedIn</span>
+              <span class="channel-value">linkedin.com/in/mohammedmansy</span>
             </a>
-            <a href="mailto:Muhammad.a.mansy@gmail.com" class="social-card">
-              <div class="social-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <div class="social-info">
-                <span class="social-name">Email</span>
-                <span class="social-handle">Muhammad.a.mansy@gmail.com</span>
-              </div>
-              <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <a href="mailto:Muhammad.a.mansy@gmail.com" class="channel-row">
+              <span class="channel-label">Email</span>
+              <span class="channel-value">Muhammad.a.mansy@gmail.com</span>
             </a>
-            <a href="tel:01126396994" class="social-card">
-              <div class="social-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              </div>
-              <div class="social-info">
-                <span class="social-name">Phone</span>
-                <span class="social-handle">01126396994</span>
-              </div>
-              <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <a href="tel:01126396994" class="channel-row">
+              <span class="channel-label">Phone</span>
+              <span class="channel-value">01126396994</span>
             </a>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   </section>
 
   <footer class="footer">
-    <div class="footer-container">
-      <p class="footer-text">
-        <span class="footer-code">&lt;</span> Designed &amp; built by <strong>Mohamed Mansy</strong> <span class="footer-code">/&gt;</span>
-      </p>
-      <p class="footer-subtext"><a href="https://mohammadmansy.github.io/portfolio" target="_blank" rel="noopener noreferrer" class="footer-link">mohammadmansy.github.io/portfolio</a> &mdash; Crafted with Unity &amp; passion for game development.</p>
+    <div class="container footer-inner">
+      <p>&copy; 2026 Mohamed Mansy</p>
+      <p class="footer-site"><a href="https://mohammadmansy.github.io/portfolio" target="_blank" rel="noopener noreferrer">mohammadmansy.github.io/portfolio</a></p>
     </div>
   </footer>
 

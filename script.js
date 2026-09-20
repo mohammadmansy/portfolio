@@ -1,66 +1,54 @@
 (() => {
   'use strict';
 
-  /* ============================================
-     Navbar Scroll Effect
-     ============================================ */
+  /* ---------- Navbar: solid background on scroll ---------- */
   const navbar = document.getElementById('navbar');
-  const handleNavScroll = () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  const onScroll = () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 24);
   };
-  window.addEventListener('scroll', handleNavScroll, { passive: true });
-  handleNavScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-  /* ============================================
-     Mobile Nav Toggle
-     ============================================ */
+  /* ---------- Mobile nav toggle ---------- */
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
 
   navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');
-    navLinks.classList.toggle('open');
+    const open = navLinks.classList.toggle('open');
+    navToggle.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', open);
   });
 
   navLinks.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
-      navToggle.classList.remove('open');
       navLinks.classList.remove('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
     });
   });
 
-  /* ============================================
-     Active Nav Link on Scroll
-     ============================================ */
+  /* ---------- Active nav link on scroll ---------- */
   const sections = document.querySelectorAll('section[id]');
-  const navLinkElements = document.querySelectorAll('.nav-link');
-
-  const observerOptions = {
-    rootMargin: '-30% 0px -60% 0px',
-    threshold: 0
-  };
+  const linkEls = document.querySelectorAll('.nav-link');
 
   const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const id = entry.target.getAttribute('id');
-        navLinkElements.forEach(link => {
+        const id = entry.target.id;
+        linkEls.forEach(link => {
           link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
         });
       }
     });
-  }, observerOptions);
+  }, { rootMargin: '-35% 0px -60% 0px', threshold: 0 });
 
   sections.forEach(section => sectionObserver.observe(section));
 
-  /* ============================================
-     Scroll Reveal Animation
-     ============================================ */
-  const revealElements = document.querySelectorAll(
-    '.project-card, .skill-category, .contact-form, .contact-links, .section-header, .portfolio-disclaimer, .experience-card'
+  /* ---------- Subtle reveal ---------- */
+  const revealEls = document.querySelectorAll(
+    '.project, .skill-group, .timeline-item, .contact-form, .contact-channel'
   );
-
-  revealElements.forEach(el => el.classList.add('reveal'));
+  revealEls.forEach(el => el.classList.add('reveal'));
 
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -69,13 +57,11 @@
         revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.1, rootMargin: '0px 0px -48px 0px' });
 
-  revealElements.forEach(el => revealObserver.observe(el));
+  revealEls.forEach(el => revealObserver.observe(el));
 
-  /* ============================================
-     Contact Form Handler — Formspree Integration
-     ============================================ */
+  /* ---------- Contact form (Formspree) ---------- */
   const contactForm = document.getElementById('contactForm');
   const formStatus = document.getElementById('formStatus');
 
@@ -92,58 +78,50 @@
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(email)) {
       formStatus.textContent = 'Please enter a valid email address.';
       formStatus.className = 'form-status error';
       return;
     }
 
     const submitBtn = contactForm.querySelector('button[type="submit"]');
-    const originalHTML = submitBtn.innerHTML;
+    const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-      Sending...
-    `;
+    submitBtn.textContent = 'Sending\u2026';
 
     try {
-      const response = await fetch(contactForm.action, {
+      const res = await fetch(contactForm.action, {
         method: 'POST',
         body: new FormData(contactForm),
         headers: { Accept: 'application/json' }
       });
 
-      if (response.ok) {
-        formStatus.textContent = 'Message sent successfully! I\'ll get back to you soon.';
+      if (res.ok) {
+        formStatus.textContent = 'Message sent — I\'ll get back to you soon.';
         formStatus.className = 'form-status success';
         contactForm.reset();
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          formStatus.textContent = data.errors.map(err => err.message).join(', ');
-        } else {
-          formStatus.textContent = 'Something went wrong. Please try again later.';
-        }
+        const data = await res.json();
+        const firstError = data.errors && data.errors[0] ? data.errors[0].message : null;
+        formStatus.textContent = firstError || 'Something went wrong — please try again.';
         formStatus.className = 'form-status error';
       }
     } catch (err) {
-      formStatus.textContent = 'Network error. Please check your connection and try again.';
+      formStatus.textContent = 'Network error — please check your connection and try again.';
       formStatus.className = 'form-status error';
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = originalHTML;
+      submitBtn.textContent = originalText;
     }
   });
 
-  /* ============================================
-     Smooth Scroll for older browsers
-     ============================================ */
+  /* ---------- Smooth scroll fallback ---------- */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
-      const targetId = anchor.getAttribute('href');
-      if (targetId === '#') return;
-      const target = document.querySelector(targetId);
+      const href = anchor.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
