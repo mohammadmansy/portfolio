@@ -183,6 +183,22 @@ section[id] {
   padding: 200px 0 120px;
 }
 
+.hero-avatar {
+  width: 104px;
+  height: 104px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.hero-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .hero-eyebrow {
   font-size: 0.8125rem;
   font-weight: 500;
@@ -775,6 +791,12 @@ section {
 
   .hero {
     padding: 150px 0 80px;
+  }
+
+  .hero-avatar {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 24px;
   }
 
   section {

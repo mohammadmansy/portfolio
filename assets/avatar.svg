@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" rx="100" fill="#13161C"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#2E3440" stroke-width="2"/>
+  <text x="100" y="101" text-anchor="middle" dominant-baseline="central" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="62" font-weight="700" fill="#38BDF8" letter-spacing="2">MM</text>
+</svg>
