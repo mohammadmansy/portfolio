@@ -483,19 +483,18 @@ section {
 /* ---------- Collection games ---------- */
 .collection-games {
   grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .collection-game {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 24px;
-  align-items: start;
-}
-
-.collection-game + .collection-game {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .game-media {
@@ -514,14 +513,32 @@ section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding: 14px 16px 16px;
   min-width: 0;
 }
 
 .game-title {
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
+}
+
+.collection-game .project-desc {
+  font-size: 0.8125rem;
+  margin-bottom: 10px;
+}
+
+.collection-game .project-tech {
+  margin-bottom: 12px;
+}
+
+.collection-game .project-links {
+  margin-top: auto;
+}
+
+.collection-game .project-links .link-accent {
+  font-size: 0.8125rem;
 }
 
 /* ---------- Skills ---------- */
@@ -845,6 +862,10 @@ section {
     grid-template-columns: 1fr;
     gap: 32px;
   }
+
+  .collection-games {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
@@ -910,7 +931,7 @@ section {
     width: 100%;
   }
 
-  .collection-game {
+  .collection-games {
     grid-template-columns: 1fr;
     gap: 16px;
   }
