@@ -480,6 +480,50 @@ section {
   text-decoration: underline;
 }
 
+/* ---------- Collection games ---------- */
+.collection-games {
+  grid-column: 1 / -1;
+}
+
+.collection-game {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.collection-game + .collection-game {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.game-media {
+  aspect-ratio: 16 / 9;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.game-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.game-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.game-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
 /* ---------- Skills ---------- */
 .skills-grid {
   display: grid;
@@ -864,6 +908,11 @@ section {
   .timeline-date {
     margin-left: 0;
     width: 100%;
+  }
+
+  .collection-game {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .footer-inner {
