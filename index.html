@@ -9,11 +9,40 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) {
+          t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
 </head>
 <body>
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
       <a href="#home" class="nav-logo">Mohamed Mansy</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" aria-pressed="false">
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2"></path>
+          <path d="M12 20v2"></path>
+          <path d="m4.93 4.93 1.41 1.41"></path>
+          <path d="m17.66 17.66 1.41 1.41"></path>
+          <path d="M2 12h2"></path>
+          <path d="M20 12h2"></path>
+          <path d="m6.34 17.66-1.41 1.41"></path>
+          <path d="m19.07 4.93-1.41 1.41"></path>
+        </svg>
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+        </svg>
+      </button>
       <ul class="nav-links" id="navLinks">
         <li><a href="#home" class="nav-link active">Home</a></li>
         <li><a href="#projects" class="nav-link">Projects</a></li>
@@ -43,10 +72,8 @@
       <div class="hero-actions">
         <a href="#projects" class="btn btn-primary">View projects</a>
         <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-outline">GitHub</a>
+        <a href="cv/CV.pdf" download class="btn btn-outline">Download CV</a>
       </div>
-      <p class="hero-cv">
-        <a href="cv/CV.pdf" download>Download CV (PDF)</a>
-      </p>
     </div>
   </section>
 
@@ -83,8 +110,8 @@
               <li>ScriptableObjects</li>
             </ul>
             <div class="project-links">
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link-accent">Play demo</a>
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
+              <a href="https://github.com/mohammadmansy/ARProject" target="_blank" rel="noopener noreferrer" class="link-accent">Play demo</a>
+              <a href="https://github.com/mohammadmansy/ARProject" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
             </div>
           </div>
         </article>
@@ -133,8 +160,8 @@
               <li>ScriptableObjects</li>
             </ul>
             <div class="project-links">
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link-accent">View projects</a>
-              <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
+              <a href="https://github.com/mohammadmansy?tab=repositories" target="_blank" rel="noopener noreferrer" class="link-accent">View projects</a>
+              <a href="https://github.com/mohammadmansy?tab=repositories" target="_blank" rel="noopener noreferrer" class="link">Source code</a>
             </div>
           </div>
         </article>

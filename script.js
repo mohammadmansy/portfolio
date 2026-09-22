@@ -9,6 +9,29 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  /* ---------- Dark / light theme toggle ---------- */
+  const themeToggle = document.getElementById('themeToggle');
+  const rootEl = document.documentElement;
+
+  const applyTheme = (theme) => {
+    rootEl.setAttribute('data-theme', theme);
+    const light = theme === 'light';
+    themeToggle.setAttribute('aria-pressed', light);
+    themeToggle.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+    try { localStorage.setItem('theme', theme); } catch (e) {}
+  };
+
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem('theme'); } catch (e) {}
+  if (!savedTheme) {
+    savedTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
   /* ---------- Mobile nav toggle ---------- */
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
