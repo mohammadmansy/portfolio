@@ -40,7 +40,10 @@
 <body>
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
-      <a href="#home" class="nav-logo">Mohamed Mansy</a>
+      <a href="#home" class="nav-logo">
+        <span class="nav-logo-mark" aria-hidden="true">MM</span>
+        <span>Mohamed Mansy</span>
+      </a>
       <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" aria-pressed="false">
         <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
           <circle cx="12" cy="12" r="4"></circle>
@@ -73,20 +76,26 @@
   </nav>
 
   <section class="hero" id="home">
-    <div class="container">
-      <div class="hero-avatar">
-        <img src="assets/profile2.jpg" alt="Portrait of Mohamed Mansy" />
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <p class="hero-eyebrow">Unity Developer &middot; C# &middot; AR / VR</p>
+        <h1 class="hero-name">Mohamed Mansy</h1>
+        <p class="hero-lead">
+          I build games and interactive experiences with Unity and C# &mdash; 2D and 3D titles, AR/VR
+          prototypes for Meta Quest and OpenXR &mdash; and I teach game development at 3C Coding School.
+        </p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">View my work</a>
+          <a href="cv/CV.pdf" download class="btn btn-outline">Download CV</a>
+        </div>
+        <div class="hero-links">
+          <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://linkedin.com/in/mohammedmansy" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="mailto:Muhammad.a.mansy@gmail.com">Email</a>
+        </div>
       </div>
-      <p class="hero-eyebrow">Unity &middot; VR &middot; Game Developer</p>
-      <h1 class="hero-name">Mohamed Mansy</h1>
-      <p class="hero-lead">
-        I build games and interactive experiences with Unity and C# &mdash; 2D and 3D titles, AR/VR
-        prototypes for Meta Quest and OpenXR &mdash; and I teach game development at 3C Coding School.
-      </p>
-      <div class="hero-actions">
-        <a href="#projects" class="btn btn-primary">View projects</a>
-        <a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer" class="btn btn-outline">GitHub</a>
-        <a href="cv/CV.pdf" download class="btn btn-outline">Download CV</a>
+      <div class="hero-portrait">
+        <img src="assets/profile2.jpg" alt="Portrait of Mohamed Mansy" />
       </div>
     </div>
   </section>
@@ -94,7 +103,7 @@
   <section class="projects" id="projects">
     <div class="container">
       <header class="section-head">
-        <p class="section-kicker">Featured work</p>
+        <p class="section-kicker">01 &mdash; Featured work</p>
         <h2 class="section-title">Projects</h2>
       </header>
 
@@ -328,7 +337,7 @@
   <section class="skills" id="skills">
     <div class="container">
       <header class="section-head">
-        <p class="section-kicker">What I work with</p>
+        <p class="section-kicker">02 &mdash; What I work with</p>
         <h2 class="section-title">Skills</h2>
       </header>
 
@@ -377,7 +386,7 @@
   <section class="experience" id="experience">
     <div class="container">
       <header class="section-head">
-        <p class="section-kicker">Career &amp; education</p>
+        <p class="section-kicker">03 &mdash; Career &amp; education</p>
         <h2 class="section-title">Experience</h2>
       </header>
 
@@ -436,7 +445,7 @@
   <section class="contact" id="contact">
     <div class="container">
       <header class="section-head">
-        <p class="section-kicker">Contact</p>
+        <p class="section-kicker">04 &mdash; Contact</p>
         <h2 class="section-title">Get in touch</h2>
       </header>
 
@@ -486,8 +495,13 @@
 
   <footer class="footer">
     <div class="container footer-inner">
-      <p>&copy; 2026 Mohamed Mansy</p>
-      <p class="footer-site"><a href="https://mohammadmansy.github.io/portfolio" target="_blank" rel="noopener noreferrer">mohammadmansy.github.io/portfolio</a></p>
+      <p class="footer-brand">&copy; 2026 Mohamed Mansy &middot; Unity Developer</p>
+      <ul class="footer-links">
+        <li><a href="https://github.com/mohammadmansy" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="https://linkedin.com/in/mohammedmansy" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="mailto:Muhammad.a.mansy@gmail.com">Email</a></li>
+        <li><a href="#home">Back to top &uarr;</a></li>
+      </ul>
     </div>
   </footer>
 
