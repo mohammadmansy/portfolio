@@ -1,19 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Simon">
   <defs>
     <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M40 0H0V40" fill="none" stroke="#191E26" stroke-width="1"/>
+      <path d="M40 0H0V40" fill="none" stroke="#1C222C" stroke-width="1"/>
     </pattern>
   </defs>
-  <rect width="800" height="450" fill="#0E1116"/>
+  <rect width="800" height="450" fill="#0F131A"/>
   <rect width="800" height="450" fill="url(#g)"/>
-  <text x="34" y="46" fill="#6B7280" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" letter-spacing="2.4">2D MEMORY GAME</text>
+  <text x="34" y="46" fill="#6A7381" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" letter-spacing="2.4">2D MEMORY GAME</text>
   <g transform="translate(260.5 135.0) scale(1.3950)">
 
-    <rect x="44" y="44" width="48" height="48" rx="10" fill="none" stroke="#38BDF8" stroke-width="3"/>
-    <rect x="108" y="44" width="48" height="48" rx="10" fill="none" stroke="#59616E" stroke-width="3"/>
-    <rect x="44" y="108" width="48" height="48" rx="10" fill="none" stroke="#59616E" stroke-width="3"/>
-    <rect x="108" y="108" width="48" height="48" rx="10" fill="none" stroke="#38BDF8" stroke-width="3"/>
+    <rect x="44" y="44" width="48" height="48" rx="10" fill="none" stroke="#58A6FF" stroke-width="3"/>
+    <rect x="108" y="44" width="48" height="48" rx="10" fill="none" stroke="#5A6470" stroke-width="3"/>
+    <rect x="44" y="108" width="48" height="48" rx="10" fill="none" stroke="#5A6470" stroke-width="3"/>
+    <rect x="108" y="108" width="48" height="48" rx="10" fill="none" stroke="#58A6FF" stroke-width="3"/>
   </g>
-  <rect x="34" y="398" width="22" height="3" rx="1.5" fill="#38BDF8"/>
-  <text x="34" y="424" fill="#8A93A0" font-family="Inter, system-ui, sans-serif" font-size="21" font-weight="600" letter-spacing="0.2">Simon</text>
+  <rect x="34" y="398" width="22" height="3" rx="1.5" fill="#58A6FF"/>
+  <text x="34" y="424" fill="#9BA4B2" font-family="Inter, system-ui, sans-serif" font-size="21" font-weight="600" letter-spacing="0.2">Simon</text>
 </svg>

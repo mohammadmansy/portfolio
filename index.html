@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mohamed Mansy — Unity &amp; VR Developer</title>
   <meta name="description" content="Portfolio of Mohamed Mansy, Unity & VR developer — 2D/3D games, AR/VR on Meta Quest & OpenXR, and game development instructor." />
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0D10" />
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F4F5F7" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0E13" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF" />
   <link rel="canonical" href="https://mohammadmansy.github.io/portfolio/" />
   <link rel="icon" href="assets/profile2.jpg" />
   <link rel="apple-touch-icon" href="assets/profile2.jpg" />
@@ -78,7 +78,10 @@
   <section class="hero" id="home">
     <div class="container hero-grid">
       <div class="hero-content">
-        <p class="hero-eyebrow">Unity Developer &middot; C# &middot; AR / VR</p>
+        <div class="hero-intro">
+          <img class="hero-avatar" src="assets/profile2.jpg" alt="Mohamed Mansy" width="52" height="52" />
+          <p class="hero-eyebrow">Unity Developer &middot; C# &middot; AR / VR</p>
+        </div>
         <h1 class="hero-name">Mohamed Mansy</h1>
         <p class="hero-lead">
           I build games and interactive experiences with Unity and C# &mdash; 2D and 3D titles, AR/VR
@@ -94,8 +97,28 @@
           <a href="mailto:Muhammad.a.mansy@gmail.com">Email</a>
         </div>
       </div>
-      <div class="hero-portrait">
-        <img src="assets/profile2.jpg" alt="Portrait of Mohamed Mansy" />
+
+      <div class="hero-play">
+        <div class="arcade-demo-screen">
+          <canvas id="stackCanvas" width="480" height="480" aria-label="Playable 3D tower stacking game"></canvas>
+          <div class="arcade-overlay" id="stackOverlay">
+            <p class="arcade-overlay-title">Stack</p>
+            <p class="arcade-overlay-text">Build the tower as high as you can.</p>
+            <button class="btn btn-primary" id="stackStart" type="button">Play</button>
+          </div>
+        </div>
+        <div class="play-bar">
+          <span class="play-title">Stack &mdash; a 3D tower builder</span>
+          <span class="play-stats">
+            <span class="play-stat"><span class="play-stat-label">Height</span><span class="play-stat-value" id="stackScore">0</span></span>
+            <span class="play-stat"><span class="play-stat-label">Best</span><span class="play-stat-value" id="stackBest">0</span></span>
+          </span>
+        </div>
+        <p class="play-note">
+          <kbd>Click</kbd> or <kbd>Space</kbd> to drop &mdash; land it dead-centre for a
+          <span class="arcade-hint-em">perfect</span> streak. A hand-written 3D engine &mdash; projection,
+          depth sorting, physics &mdash; no libraries.
+        </p>
       </div>
     </div>
   </section>
@@ -184,40 +207,6 @@
             </div>
           </div>
         </article>
-
-        <div class="arcade-demo">
-          <div class="arcade-demo-screen">
-            <canvas id="stackCanvas" width="480" height="480" aria-label="Playable 3D tower stacking game"></canvas>
-            <div class="arcade-overlay" id="stackOverlay">
-              <p class="arcade-overlay-title">Stack</p>
-              <p class="arcade-overlay-text">Build the tower as high as you can.</p>
-              <button class="btn btn-primary" id="stackStart" type="button">Play</button>
-            </div>
-          </div>
-          <div class="arcade-demo-info">
-            <p class="project-meta">Playable demo &middot; real-time 3D</p>
-            <h3 class="game-title">Stack &mdash; a 3D tower builder</h3>
-            <p class="project-desc">
-              Drop each block on the one below. Line it up perfectly and the tower glows. Miss the
-              edge and the overhang shears off and falls. A tiny 3D engine &mdash; projection, depth
-              sorting, lighting and physics &mdash; written from scratch, no libraries.
-            </p>
-            <div class="arcade-stats">
-              <div class="arcade-stat">
-                <span class="arcade-stat-label">Height</span>
-                <span class="arcade-stat-value" id="stackScore">0</span>
-              </div>
-              <div class="arcade-stat">
-                <span class="arcade-stat-label">Best</span>
-                <span class="arcade-stat-value" id="stackBest">0</span>
-              </div>
-            </div>
-            <p class="arcade-hint">
-              <kbd>Click</kbd> or <kbd>Space</kbd> to drop &middot; land it dead-centre for a
-              <span class="arcade-hint-em">perfect</span> streak
-            </p>
-          </div>
-        </div>
 
         <div class="subsection-head">
           <h3 class="subsection-title">From the arcade collection</h3>

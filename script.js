@@ -69,7 +69,7 @@
 
   /* ---------- Subtle reveal ---------- */
   const revealEls = document.querySelectorAll(
-    '.project, .skill-group, .timeline-item, .contact-form, .contact-channel'
+    '.section-head, .subsection-head, .project, .skill-group, .timeline-item, .contact-form, .contact-channel'
   );
   revealEls.forEach(el => el.classList.add('reveal'));
 
@@ -156,6 +156,61 @@
   });
 })();
 
+/* ---------- Smooth (inertial) scrolling ----------
+   Native wheel scrolling, eased frame-by-frame for a calm, premium
+   glide. Desktop + fine pointers only, and only when motion is allowed.
+   Keyboard, scrollbar and touch keep native behaviour.            */
+(() => {
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (reduce || !fine) return;
+
+  const root = document.documentElement;
+  root.style.scrollBehavior = 'auto'; // our lerp drives the motion
+
+  const maxScroll = () => Math.max(0, root.scrollHeight - window.innerHeight);
+  const clamp = (v) => (v < 0 ? 0 : v > maxScroll() ? maxScroll() : v);
+
+  let target = window.scrollY;
+  let current = window.scrollY;
+  let raf = null;
+
+  const frame = () => {
+    current += (target - current) * 0.135;
+    if (Math.abs(target - current) < 0.4) {
+      current = target;
+      window.scrollTo(0, current);
+      raf = null;
+      return;
+    }
+    window.scrollTo(0, current);
+    raf = requestAnimationFrame(frame);
+  };
+
+  const kick = () => { if (raf === null) raf = requestAnimationFrame(frame); };
+
+  window.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) return;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+
+    let d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16;
+    else if (e.deltaMode === 2) d *= window.innerHeight;
+
+    target = clamp(target + d);
+    e.preventDefault();
+    kick();
+  }, { passive: false });
+
+  window.addEventListener('scroll', () => {
+    if (raf !== null) return;
+    target = window.scrollY;
+    current = window.scrollY;
+  }, { passive: true });
+
+  window.addEventListener('resize', () => { target = clamp(target); });
+})();
+
 /* ---------- Stack: hand-coded 3D tower game ----------
    A tiny software 3D renderer (isometric projection, painter's
    depth sorting, flat shading, glowing edges) plus simple physics.
@@ -220,7 +275,12 @@
   let moving, level, movePos, moveDir, moveSpeed;
   let focusY, focusTarget, combo, flash, perfMsg, score;
   let running = false, frozen = false, over = false, dead = false;
+  let shake = 0;
   let lastTs = 0;
+
+  const vibrate = (pattern) => {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
+  };
 
   let best = 0;
   try { best = Number(localStorage.getItem('stack-best')) || 0; } catch (e) {}
@@ -295,6 +355,25 @@
     }
   };
 
+  /* --- landing dust --- */
+  const puff = (b, n, spread) => {
+    const top = b.y + HEIGHT;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 0.25 + Math.random() * spread;
+      particles.push({
+        x: b.x + (Math.random() - 0.5) * b.sx,
+        y: top + 0.04,
+        z: b.z + (Math.random() - 0.5) * b.sz,
+        vx: Math.cos(a) * sp,
+        vz: Math.sin(a) * sp,
+        vy: 0.5 + Math.random() * 1.1,
+        life: 0.7,
+        max: 0.7
+      });
+    }
+  };
+
   /* --- drop the active block --- */
   const drop = () => {
     if (!running || !moving || over) return;
@@ -320,6 +399,8 @@
       flash = 1;
       perfMsg = { t: 1, text: combo > 1 ? 'PERFECT \u00d7' + combo : 'PERFECT' };
       burst(placed);
+      puff(placed, 7, 0.9);
+      vibrate(10);
     } else {
       const cutSize = ms - ov;
       const cutCenter = mc > pc
@@ -337,6 +418,8 @@
       if (axis === 'x') { placed.x = (lo + hi) / 2; placed.sx = ov; }
       else { placed.z = (lo + hi) / 2; placed.sz = ov; }
       combo = 0;
+      puff(placed, 6, 1.2);
+      vibrate(6);
     }
 
     blocks.push(placed);
@@ -353,6 +436,8 @@
     moving = null;
     over = true;
     dead = true;
+    shake = 1;
+    vibrate([14, 36, 26]);
     if (score > best) {
       best = score;
       bestEl.textContent = best;
@@ -378,6 +463,7 @@
 
     focusY += (focusTarget - focusY) * Math.min(1, dt / 140);
     if (flash > 0) flash = Math.max(0, flash - s * 2.4);
+    if (shake > 0) shake = Math.max(0, shake - s * 3.4);
     if (perfMsg) { perfMsg.t -= s * 1.6; if (perfMsg.t <= 0) perfMsg = null; }
 
     for (let i = debris.length - 1; i >= 0; i--) {
@@ -458,8 +544,14 @@
   };
 
   const render = () => {
+    ctx.save();
+    if (shake > 0) {
+      const amp = shake * shake * 13;
+      ctx.translate((Math.random() * 2 - 1) * amp, (Math.random() * 2 - 1) * amp);
+    }
+
     ctx.fillStyle = COL.bg;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(-40, -40, W + 80, H + 80);
 
     const g = ctx.createRadialGradient(CX, CY - 30, 8, CX, CY - 10, W * 0.62);
     g.addColorStop(0, shade(COL.accent, 1, 0.17));
@@ -513,6 +605,8 @@
       ctx.fillText(perfMsg.text, p.x, p.y - (1 - perfMsg.t) * 30);
       ctx.restore();
     }
+
+    ctx.restore();
   };
 
   /* --- loop --- */
@@ -545,6 +639,7 @@
     combo = 0;
     flash = 0;
     perfMsg = null;
+    shake = 0;
     score = 0;
     over = false;
     dead = false;

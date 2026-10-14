@@ -1,27 +1,27 @@
 /* ============================================================
-   Portfolio — restrained dark theme
+   Portfolio — calm, professional dark theme
    ------------------------------------------------------------
-   Background   #0B0D10
-   Surface      #13161C
-   Borders      #222731
-   Text         #F3F4F6 / #9CA3AF / #6B7280
-   Accent       #38BDF8 (used sparingly)
+   Background   #0B0E13
+   Surface      #12161D
+   Borders      #252B36
+   Text         #ECEFF4 / #9BA4B2 / #6A7381
+   Accent       #58A6FF (used sparingly)
    ============================================================ */
 
 :root {
-  --bg: #0B0D10;
-  --surface: #13161C;
-  --surface-2: #171B22;
-  --border: #222731;
-  --border-strong: #2E3440;
+  --bg: #0B0E13;
+  --surface: #12161D;
+  --surface-2: #191E27;
+  --border: #252B36;
+  --border-strong: #343B48;
 
-  --text: #F3F4F6;
-  --text-2: #9CA3AF;
-  --text-3: #6B7280;
+  --text: #ECEFF4;
+  --text-2: #9BA4B2;
+  --text-3: #6A7381;
 
-  --accent: #38BDF8;
-  --accent-strong: #0EA5E9;
-  --accent-ink: #06252F;
+  --accent: #58A6FF;
+  --accent-strong: #4685E0;
+  --accent-ink: #06121F;
 
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
@@ -29,7 +29,7 @@
   --nav-height: 64px;
   --container-max: 1080px;
 
-  --accent-soft: rgba(56, 189, 248, 0.16);
+  --accent-soft: rgba(88, 166, 255, 0.16);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 18px 44px -22px rgba(0, 0, 0, 0.75);
 
@@ -40,17 +40,17 @@
 /* ---------- Light theme (same design language) ---------- */
 html[data-theme="light"] {
   --bg: #FFFFFF;
-  --surface: #F4F6F8;
-  --surface-2: #E9ECF0;
-  --border: #E3E7ED;
-  --border-strong: #C9D0DB;
-  --text: #16181C;
-  --text-2: #525A66;
-  --text-3: #8792A0;
-  --accent: #0284C7;
-  --accent-strong: #0369A1;
-  --accent-ink: #06252F;
-  --accent-soft: rgba(2, 132, 199, 0.14);
+  --surface: #F7F8FA;
+  --surface-2: #EEF0F4;
+  --border: #E4E7EC;
+  --border-strong: #CBD2DC;
+  --text: #131820;
+  --text-2: #4A5361;
+  --text-3: #8790A0;
+  --accent: #2563EB;
+  --accent-strong: #1D4ED8;
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(37, 99, 235, 0.14);
   --shadow-sm: 0 1px 2px rgba(16, 20, 28, 0.06);
   --shadow-md: 0 20px 44px -26px rgba(16, 20, 28, 0.32);
 }
@@ -315,48 +315,38 @@ html[data-theme="light"] .theme-icon-moon {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 72px;
+  grid-template-columns: 1fr minmax(0, 420px);
+  gap: 64px;
   align-items: center;
 }
 
 .hero-content {
-  max-width: 640px;
+  max-width: 620px;
 }
 
-.hero-portrait {
-  aspect-ratio: 4 / 5;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--surface);
+.hero-intro {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
 }
 
-.hero-portrait img {
-  width: 100%;
-  height: 100%;
+.hero-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center 18%;
+  border: 1px solid var(--border-strong);
+  flex-shrink: 0;
 }
 
 .hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
   font-size: 0.8125rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-2);
-  margin-bottom: 26px;
-}
-
-.hero-eyebrow::before {
-  content: '';
-  width: 26px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--accent);
 }
 
 .hero-name {
@@ -728,17 +718,11 @@ section {
   font-size: 0.8125rem;
 }
 
-/* ---------- Playable arcade demo ---------- */
-.arcade-demo {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 420px) 1fr;
-  gap: 36px;
-  align-items: center;
-  padding: 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+/* ---------- Playable demo (hero centrepiece) ---------- */
+.hero-play {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .arcade-demo-screen {
@@ -748,6 +732,7 @@ section {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 .arcade-demo-screen canvas {
@@ -788,26 +773,32 @@ section {
   margin-bottom: 6px;
 }
 
-.arcade-demo-info {
+.play-bar {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
 }
 
-.arcade-stats {
-  display: flex;
-  gap: 32px;
-  margin: 18px 0;
+.play-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
 }
 
-.arcade-stat {
+.play-stats {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: 20px;
 }
 
-.arcade-stat-label {
+.play-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.play-stat-label {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -815,20 +806,20 @@ section {
   color: var(--text-3);
 }
 
-.arcade-stat-value {
-  font-size: 1.5rem;
+.play-stat-value {
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
 
-.arcade-hint {
+.play-note {
   font-size: 0.75rem;
-  line-height: 1.8;
+  line-height: 1.7;
   color: var(--text-3);
 }
 
-.arcade-hint kbd {
+.play-note kbd {
   display: inline-block;
   min-width: 20px;
   padding: 1px 6px;
@@ -1175,9 +1166,10 @@ section {
     gap: 40px;
   }
 
-  .hero-portrait {
-    order: -1;
-    width: 260px;
+  .hero-play {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
   }
 
   .project-featured {
@@ -1205,17 +1197,6 @@ section {
 
   .collection-games {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .arcade-demo {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .arcade-demo-screen {
-    max-width: 400px;
-    width: 100%;
-    margin: 0 auto;
   }
 }
 
@@ -1257,10 +1238,6 @@ section {
 
   .hero {
     padding: 150px 0 80px;
-  }
-
-  .hero-portrait {
-    width: 200px;
   }
 
   section {
