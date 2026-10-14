@@ -647,6 +647,18 @@ section {
   border-radius: var(--radius);
 }
 
+.arcade-demo--reverse {
+  grid-template-columns: 1fr minmax(0, 360px);
+}
+
+.arcade-demo--reverse .arcade-demo-info {
+  order: 1;
+}
+
+.arcade-demo--reverse .arcade-demo-screen {
+  order: 2;
+}
+
 .arcade-demo-screen {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -1103,6 +1115,11 @@ section {
 
   .arcade-demo-screen {
     max-width: 340px;
+  }
+
+  .arcade-demo--reverse .arcade-demo-info,
+  .arcade-demo--reverse .arcade-demo-screen {
+    order: 0;
   }
 }
 

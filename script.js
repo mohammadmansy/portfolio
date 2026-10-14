@@ -347,3 +347,290 @@
   reset();
   showOverlay('Snake', 'Arrow keys or WASD to play', 'Play');
 })();
+
+/* ---------- "It's not a bug, it's a feature" (arcade demo) ---------- */
+(() => {
+  const canvas = document.getElementById('bugCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const overlay = document.getElementById('bugOverlay');
+  const startBtn = document.getElementById('bugStart');
+  const scoreEl = document.getElementById('bugScore');
+  const livesEl = document.getElementById('bugLives');
+  const bestEl = document.getElementById('bugBest');
+  const quipEl = document.getElementById('bugQuip');
+
+  const W = canvas.width;
+  const H = canvas.height;
+  const FEATURE_COLOR = '#F59E0B';
+  const MAX_LIVES = 3;
+
+  const QUIPS = [
+    'Works on my machine.',
+    'Have you tried turning it off and on again?',
+    'git commit -m "fixed the bug"',
+    'Shipping it anyway.'
+  ];
+
+  let PAL;
+  const refreshPal = () => {
+    const cs = getComputedStyle(document.documentElement);
+    PAL = {
+      bg: cs.getPropertyValue('--surface-2').trim(),
+      grid: cs.getPropertyValue('--border').trim(),
+      bug: cs.getPropertyValue('--accent').trim(),
+      body: cs.getPropertyValue('--accent-strong').trim(),
+      text: cs.getPropertyValue('--text').trim()
+    };
+  };
+  refreshPal();
+
+  let items = [];
+  let splats = [];
+  let score = 0;
+  let lives = MAX_LIVES;
+  let clock = 0;
+  let nextSpawn = 0;
+  let lastTs = 0;
+  let running = false;
+  let frozen = false;
+
+  let best = 0;
+  try { best = Number(localStorage.getItem('bug-best')) || 0; } catch (e) {}
+  bestEl.textContent = best;
+
+  const pickQuip = () => QUIPS[(Math.random() * QUIPS.length) | 0];
+
+  function spawn() {
+    const isFeature = Math.random() < 0.22;
+    const r = 20;
+    const m = r + 20;
+    items.push({
+      x: m + Math.random() * (W - m * 2),
+      y: m + Math.random() * (H - m * 2),
+      type: isFeature ? 'feature' : 'bug',
+      born: clock,
+      life: (isFeature ? 2300 : 1550) * (1 - 0.35 * Math.min(1, clock / 45000)),
+      r,
+      angle: Math.random() * Math.PI * 2
+    });
+  }
+
+  function loseLife(reason) {
+    lives -= 1;
+    livesEl.textContent = Math.max(0, lives);
+    quipEl.textContent = reason === 'feature'
+      ? "It's not a bug, it's a feature!"
+      : 'A bug slipped through the build...';
+    if (lives <= 0) gameOver();
+  }
+
+  function gameOver() {
+    running = false;
+    if (score > best) {
+      best = score;
+      bestEl.textContent = best;
+      try { localStorage.setItem('bug-best', best); } catch (e) {}
+    }
+    showOverlay('Build failed', 'Squashed ' + score + ' \u00b7 ' + pickQuip(), 'Rebuild');
+  }
+
+  function squash(x, y) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      if (Math.hypot(it.x - x, it.y - y) > it.r * 1.25) continue;
+      items.splice(i, 1);
+      if (it.type === 'bug') {
+        score += 1;
+        scoreEl.textContent = score;
+        splats.push({ x: it.x, y: it.y, t: clock, color: PAL.bug });
+      } else {
+        splats.push({ x: it.x, y: it.y, t: clock, color: FEATURE_COLOR });
+        loseLife('feature');
+      }
+      return;
+    }
+  }
+
+  function drawBug(x, y, r, angle, c) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = c.body;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    for (const side of [-1, 1]) {
+      for (const off of [-0.55, 0, 0.55]) {
+        ctx.beginPath();
+        ctx.moveTo(0, off * r * 0.7);
+        ctx.lineTo(side * r * 1.3, off * r * 1.05 + Math.sin(angle * 6 + off) * 1.5);
+        ctx.stroke();
+      }
+    }
+    ctx.fillStyle = c.body;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.72, r, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = c.bug;
+    ctx.beginPath();
+    ctx.arc(0, -r * 0.85, r * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = c.bug;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.28, -r * 1.12); ctx.lineTo(-r * 0.6, -r * 1.5);
+    ctx.moveTo(r * 0.28, -r * 1.12); ctx.lineTo(r * 0.6, -r * 1.5);
+    ctx.stroke();
+    ctx.fillStyle = c.bg;
+    ctx.beginPath(); ctx.arc(-r * 0.16, -r * 0.92, r * 0.1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r * 0.16, -r * 0.92, r * 0.1, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawStar(cx, cy, r, color) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const spikes = 5;
+    const outer = r * 1.05;
+    const inner = r * 0.46;
+    for (let i = 0; i < spikes * 2; i++) {
+      const rad = i % 2 ? inner : outer;
+      const a = (Math.PI / spikes) * i - Math.PI / 2;
+      const px = Math.cos(a) * rad;
+      const py = Math.sin(a) * rad;
+      if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.fillStyle = PAL.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = PAL.grid;
+    ctx.lineWidth = 1;
+    const cols = 16;
+    const step = W / cols;
+    for (let i = 1; i < cols; i++) {
+      ctx.beginPath(); ctx.moveTo(i * step, 0); ctx.lineTo(i * step, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i * step); ctx.lineTo(W, i * step); ctx.stroke();
+    }
+
+    splats.forEach((s) => {
+      const k = (clock - s.t) / 350;
+      ctx.globalAlpha = Math.max(0, 1 - k);
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 12 + k * 26, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    items.forEach((it) => {
+      const remain = 1 - (clock - it.born) / it.life;
+      ctx.strokeStyle = it.type === 'feature' ? FEATURE_COLOR : PAL.bug;
+      ctx.globalAlpha = 0.45;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(it.x, it.y, it.r + 9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, remain));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      if (it.type === 'feature') drawStar(it.x, it.y, it.r, FEATURE_COLOR);
+      else drawBug(it.x, it.y, it.r, it.angle, PAL);
+    });
+  }
+
+  function update(dt) {
+    nextSpawn -= dt;
+    if (nextSpawn <= 0) {
+      spawn();
+      const difficulty = Math.min(1, clock / 45000);
+      nextSpawn = (820 - 380 * difficulty) + Math.random() * 260;
+    }
+
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      if (clock - it.born >= it.life) {
+        items.splice(i, 1);
+        if (it.type === 'bug') {
+          loseLife('escape');
+          if (!running) return;
+        }
+      } else {
+        it.angle += dt * 0.0016;
+      }
+    }
+
+    splats = splats.filter((s) => clock - s.t < 350);
+  }
+
+  function loop(ts) {
+    if (!running) return;
+    const dt = Math.min(48, ts - lastTs);
+    lastTs = ts;
+    if (frozen) {
+      requestAnimationFrame(loop);
+      return;
+    }
+    clock += dt;
+    update(dt);
+    render();
+    if (running) requestAnimationFrame(loop);
+  }
+
+  function showOverlay(title, text, label) {
+    overlay.querySelector('.arcade-overlay-title').textContent = title;
+    overlay.querySelector('.arcade-overlay-text').textContent = text;
+    startBtn.textContent = label;
+    overlay.classList.remove('hidden');
+  }
+
+  function reset() {
+    items = [];
+    splats = [];
+    score = 0;
+    lives = MAX_LIVES;
+    clock = 0;
+    nextSpawn = 500;
+    frozen = false;
+    scoreEl.textContent = score;
+    livesEl.textContent = lives;
+    quipEl.textContent = 'Bugs: click to fix \u00b7 Features: hands off';
+    refreshPal();
+    render();
+  }
+
+  function start() {
+    overlay.classList.add('hidden');
+    reset();
+    running = true;
+    lastTs = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  startBtn.addEventListener('click', start);
+
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!running) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (W / rect.width);
+    const y = (e.clientY - rect.top) * (H / rect.height);
+    squash(x, y);
+  });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { frozen = running && !entry.isIntersecting; });
+    }, { threshold: 0 }).observe(canvas);
+  }
+
+  new MutationObserver(() => { refreshPal(); if (!running) render(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  reset();
+  showOverlay('Squash the Bugs', 'Fix the bugs. Never touch a feature.', 'Play');
+})();

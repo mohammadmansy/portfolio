@@ -187,6 +187,40 @@
 
         <div class="arcade-demo">
           <div class="arcade-demo-screen">
+            <canvas id="bugCanvas" width="480" height="480" aria-label="Playable bug squash game"></canvas>
+            <div class="arcade-overlay" id="bugOverlay">
+              <p class="arcade-overlay-title">Squash the Bugs</p>
+              <p class="arcade-overlay-text">Fix the bugs. Never touch a feature.</p>
+              <button class="btn btn-primary" id="bugStart" type="button">Play</button>
+            </div>
+          </div>
+          <div class="arcade-demo-info">
+            <p class="project-meta">Playable demo</p>
+            <h3 class="game-title">It&rsquo;s not a bug, it&rsquo;s a feature</h3>
+            <p class="project-desc">
+              Squash the bugs before they crawl away &mdash; but leave the features alone. Tap one and
+              the build fails. A tiny homage to every late-night debugging session.
+            </p>
+            <div class="arcade-stats">
+              <div class="arcade-stat">
+                <span class="arcade-stat-label">Squashed</span>
+                <span class="arcade-stat-value" id="bugScore">0</span>
+              </div>
+              <div class="arcade-stat">
+                <span class="arcade-stat-label">Builds</span>
+                <span class="arcade-stat-value" id="bugLives">3</span>
+              </div>
+              <div class="arcade-stat">
+                <span class="arcade-stat-label">Best</span>
+                <span class="arcade-stat-value" id="bugBest">0</span>
+              </div>
+            </div>
+            <p class="arcade-hint" id="bugQuip">Bugs: click to fix &middot; Features: hands off</p>
+          </div>
+        </div>
+
+        <div class="arcade-demo arcade-demo--reverse">
+          <div class="arcade-demo-screen">
             <canvas id="snakeCanvas" width="480" height="480" aria-label="Playable Snake game"></canvas>
             <div class="arcade-overlay" id="arcadeOverlay">
               <p class="arcade-overlay-title">Snake</p>
