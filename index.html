@@ -109,9 +109,23 @@
         </div>
         <div class="play-bar">
           <span class="play-title">Stack &mdash; a 3D tower builder</span>
-          <span class="play-stats">
-            <span class="play-stat"><span class="play-stat-label">Height</span><span class="play-stat-value" id="stackScore">0</span></span>
-            <span class="play-stat"><span class="play-stat-label">Best</span><span class="play-stat-value" id="stackBest">0</span></span>
+          <span class="play-right">
+            <span class="play-stats">
+              <span class="play-stat"><span class="play-stat-label">Height</span><span class="play-stat-value" id="stackScore">0</span></span>
+              <span class="play-stat"><span class="play-stat-label">Best</span><span class="play-stat-value" id="stackBest">0</span></span>
+            </span>
+            <button class="play-sound" id="stackSound" type="button" aria-pressed="true" aria-label="Mute sound">
+              <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M11 5 6 9H3v6h3l5 4z"></path>
+                <path d="M15.5 8.6a5 5 0 0 1 0 6.8"></path>
+                <path d="M18.6 5.5a9 9 0 0 1 0 13"></path>
+              </svg>
+              <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M11 5 6 9H3v6h3l5 4z"></path>
+                <path d="m16 9 4 6"></path>
+                <path d="m20 9-4 6"></path>
+              </svg>
+            </button>
           </span>
         </div>
         <p class="play-note">

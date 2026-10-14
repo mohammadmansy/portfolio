@@ -211,6 +211,32 @@
   window.addEventListener('resize', () => { target = clamp(target); });
 })();
 
+/* ---------- Scroll-linked softening (hero) ----------
+   As the hero scrolls away, the play panel drifts and fades for a
+   soft, transparent hand-off into the page.                        */
+(() => {
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  const play = document.querySelector('.hero-play');
+  if (!play) return;
+
+  let ticking = false;
+  const apply = () => {
+    ticking = false;
+    const vh = window.innerHeight || 1;
+    const p = Math.min(1, Math.max(0, window.scrollY / (vh * 0.85)));
+    play.style.transform = 'translateY(' + (p * 26).toFixed(1) + 'px) scale(' + (1 - p * 0.04).toFixed(3) + ')';
+    play.style.opacity = (1 - p * 0.72).toFixed(3);
+  };
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(apply);
+  }, { passive: true });
+  apply();
+})();
+
 /* ---------- Stack: hand-coded 3D tower game ----------
    A tiny software 3D renderer (isometric projection, painter's
    depth sorting, flat shading, glowing edges) plus simple physics.
@@ -259,6 +285,47 @@
     return 'rgba(' + r + ',' + g + ',' + b + ',' + (a === undefined ? 1 : a) + ')';
   };
 
+  const rgbToHsl = (c) => {
+    const r = c.r / 255, g = c.g / 255, b = c.b / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    const d = max - min;
+    let h = 0, s = 0;
+    if (d) {
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return { h: h * 360, s: s, l: l };
+  };
+
+  const hslToRgb = (h, s, l) => {
+    h = (((h % 360) + 360) % 360) / 360;
+    const hue = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+    if (!s) return { r: Math.round(l * 255), g: Math.round(l * 255), b: Math.round(l * 255) };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    return {
+      r: Math.round(hue(p, q, h + 1 / 3) * 255),
+      g: Math.round(hue(p, q, h) * 255),
+      b: Math.round(hue(p, q, h - 1 / 3) * 255)
+    };
+  };
+
+  const rotateHue = (c, deg) => {
+    const hsl = rgbToHsl(c);
+    return hslToRgb(hsl.h + deg, hsl.s, hsl.l);
+  };
+
   let COL;
   const refreshColors = () => {
     const cs = getComputedStyle(document.documentElement);
@@ -271,7 +338,7 @@
   refreshColors();
 
   /* --- world state --- */
-  let blocks, debris, particles;
+  let blocks, debris, particles, rings;
   let moving, level, movePos, moveDir, moveSpeed;
   let focusY, focusTarget, combo, flash, perfMsg, score;
   let running = false, frozen = false, over = false, dead = false;
@@ -281,6 +348,67 @@
   const vibrate = (pattern) => {
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
   };
+
+  /* --- score feedback --- */
+  const popScore = () => {
+    scoreEl.classList.remove('pop');
+    void scoreEl.offsetWidth;
+    scoreEl.classList.add('pop');
+  };
+
+  /* --- sound (Web Audio, no assets) --- */
+  let soundOn = true;
+  try { soundOn = localStorage.getItem('stack-sound') !== 'off'; } catch (e) {}
+  const soundBtn = document.getElementById('stackSound');
+  const paintSound = () => {
+    if (!soundBtn) return;
+    soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+    soundBtn.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
+  };
+  paintSound();
+
+  let audioCtx = null;
+  const initAudio = () => {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) { try { audioCtx = new AC(); } catch (e) { audioCtx = null; } }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  };
+
+  const tone = (freq, dur, type, gain, delay) => {
+    if (!soundOn || !audioCtx) return;
+    const t0 = audioCtx.currentTime + (delay || 0);
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain || 0.05, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + (dur || 0.14));
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t0);
+    osc.stop(t0 + (dur || 0.14) + 0.03);
+  };
+
+  const sndDrop = () => tone(150 + Math.random() * 40, 0.09, 'triangle', 0.045);
+  const sndPerfect = (n) => {
+    const base = 480 + Math.min(11, n) * 55;
+    tone(base, 0.14, 'sine', 0.06);
+    tone(base * 1.5, 0.18, 'sine', 0.03, 0.04);
+  };
+  const sndCrash = () => { tone(92, 0.4, 'sawtooth', 0.07); tone(58, 0.5, 'sine', 0.05, 0.02); };
+
+  if (soundBtn) {
+    soundBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      paintSound();
+      try { localStorage.setItem('stack-sound', soundOn ? 'on' : 'off'); } catch (e) {}
+      initAudio();
+      if (soundOn) sndPerfect(1);
+    });
+  }
 
   let best = 0;
   try { best = Number(localStorage.getItem('stack-best')) || 0; } catch (e) {}
@@ -400,7 +528,9 @@
       perfMsg = { t: 1, text: combo > 1 ? 'PERFECT \u00d7' + combo : 'PERFECT' };
       burst(placed);
       puff(placed, 7, 0.9);
+      rings.push({ x: placed.x, z: placed.z, y: placed.y + HEIGHT, r: 0.32, life: 1 });
       vibrate(10);
+      sndPerfect(combo);
     } else {
       const cutSize = ms - ov;
       const cutCenter = mc > pc
@@ -420,12 +550,14 @@
       combo = 0;
       puff(placed, 6, 1.2);
       vibrate(6);
+      sndDrop();
     }
 
     blocks.push(placed);
     level += 1;
     score = level - 1;
     scoreEl.textContent = score;
+    popScore();
     moving = null;
     spawnMoving();
   };
@@ -438,6 +570,7 @@
     dead = true;
     shake = 1;
     vibrate([14, 36, 26]);
+    sndCrash();
     if (score > best) {
       best = score;
       bestEl.textContent = best;
@@ -482,6 +615,13 @@
       if (p.life <= 0) particles.splice(i, 1);
     }
     if (particles.length > 120) particles.splice(0, particles.length - 120);
+
+    for (let i = rings.length - 1; i >= 0; i--) {
+      const r = rings[i];
+      r.r += s * 3.4;
+      r.life -= s * 1.5;
+      if (r.life <= 0) rings.splice(i, 1);
+    }
   };
 
   /* --- drawing --- */
@@ -503,7 +643,7 @@
     const y0 = b.y, y1 = b.y + HEIGHT;
 
     const bright = 0.72 + 0.34 * Math.sin(b.y * 0.5 + 0.4);
-    const c = COL.accent;
+    const c = rotateHue(COL.accent, Math.sin(b.y * 0.45) * 36);
 
     fillQuad([
       project(x0, y1, z1), project(x1, y1, z1), project(x1, y0, z1), project(x0, y0, z1)
@@ -543,6 +683,26 @@
     ctx.globalAlpha = 1;
   };
 
+  const drawRings = () => {
+    for (let i = 0; i < rings.length; i++) {
+      const ring = rings[i];
+      const a = clamp(ring.life, 0, 1);
+      const N = 40;
+      ctx.beginPath();
+      for (let j = 0; j <= N; j++) {
+        const ang = (j / N) * Math.PI * 2;
+        const s = project(ring.x + Math.cos(ang) * ring.r, ring.y, ring.z + Math.sin(ang) * ring.r);
+        if (j) ctx.lineTo(s.x, s.y); else ctx.moveTo(s.x, s.y);
+      }
+      ctx.strokeStyle = shade(COL.accent, 1.5, a * 0.8);
+      ctx.lineWidth = 1.5 + a * 1.5;
+      ctx.shadowColor = shade(COL.accent, 1.4, a * 0.8);
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+  };
+
   const render = () => {
     ctx.save();
     if (shake > 0) {
@@ -576,6 +736,8 @@
     for (const it of items) drawBox(it.b, it.a);
 
     if (moving) drawBox(moving, 1);
+
+    drawRings();
 
     drawParticles();
 
@@ -635,6 +797,7 @@
     blocks = [{ x: 0, z: 0, sx: 1, sz: 1, y: 0 }];
     debris = [];
     particles = [];
+    rings = [];
     level = 1;
     combo = 0;
     flash = 0;
@@ -653,6 +816,7 @@
 
   const start = () => {
     startBtn.blur();
+    initAudio();
     overlay.classList.add('hidden');
     reset();
     frozen = false;
