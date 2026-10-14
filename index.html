@@ -187,68 +187,34 @@
 
         <div class="arcade-demo">
           <div class="arcade-demo-screen">
-            <canvas id="bugCanvas" width="480" height="480" aria-label="Playable bug squash game"></canvas>
-            <div class="arcade-overlay" id="bugOverlay">
-              <p class="arcade-overlay-title">Squash the Bugs</p>
-              <p class="arcade-overlay-text">Fix the bugs. Never touch a feature.</p>
-              <button class="btn btn-primary" id="bugStart" type="button">Play</button>
+            <canvas id="stackCanvas" width="480" height="480" aria-label="Playable 3D tower stacking game"></canvas>
+            <div class="arcade-overlay" id="stackOverlay">
+              <p class="arcade-overlay-title">Stack</p>
+              <p class="arcade-overlay-text">Build the tower as high as you can.</p>
+              <button class="btn btn-primary" id="stackStart" type="button">Play</button>
             </div>
           </div>
           <div class="arcade-demo-info">
-            <p class="project-meta">Playable demo</p>
-            <h3 class="game-title">It&rsquo;s not a bug, it&rsquo;s a feature</h3>
+            <p class="project-meta">Playable demo &middot; real-time 3D</p>
+            <h3 class="game-title">Stack &mdash; a 3D tower builder</h3>
             <p class="project-desc">
-              Squash the bugs before they crawl away &mdash; but leave the features alone. Tap one and
-              the build fails. A tiny homage to every late-night debugging session.
+              Drop each block on the one below. Line it up perfectly and the tower glows. Miss the
+              edge and the overhang shears off and falls. A tiny 3D engine &mdash; projection, depth
+              sorting, lighting and physics &mdash; written from scratch, no libraries.
             </p>
             <div class="arcade-stats">
               <div class="arcade-stat">
-                <span class="arcade-stat-label">Squashed</span>
-                <span class="arcade-stat-value" id="bugScore">0</span>
-              </div>
-              <div class="arcade-stat">
-                <span class="arcade-stat-label">Builds</span>
-                <span class="arcade-stat-value" id="bugLives">3</span>
+                <span class="arcade-stat-label">Height</span>
+                <span class="arcade-stat-value" id="stackScore">0</span>
               </div>
               <div class="arcade-stat">
                 <span class="arcade-stat-label">Best</span>
-                <span class="arcade-stat-value" id="bugBest">0</span>
-              </div>
-            </div>
-            <p class="arcade-hint" id="bugQuip">Bugs: click to fix &middot; Features: hands off</p>
-          </div>
-        </div>
-
-        <div class="arcade-demo arcade-demo--reverse">
-          <div class="arcade-demo-screen">
-            <canvas id="snakeCanvas" width="480" height="480" aria-label="Playable Snake game"></canvas>
-            <div class="arcade-overlay" id="arcadeOverlay">
-              <p class="arcade-overlay-title">Snake</p>
-              <p class="arcade-overlay-text">Arrow keys or WASD to play</p>
-              <button class="btn btn-primary" id="arcadeStart" type="button">Play</button>
-            </div>
-          </div>
-          <div class="arcade-demo-info">
-            <p class="project-meta">Played in your browser</p>
-            <h3 class="game-title">Try Snake right here</h3>
-            <p class="project-desc">
-              A real, playable game &mdash; hand-coded on canvas with plain JavaScript, no engine and no
-              dependencies. Same classic loop I rebuild in Unity, running live on this page.
-            </p>
-            <div class="arcade-stats">
-              <div class="arcade-stat">
-                <span class="arcade-stat-label">Score</span>
-                <span class="arcade-stat-value" id="arcadeScore">0</span>
-              </div>
-              <div class="arcade-stat">
-                <span class="arcade-stat-label">Best</span>
-                <span class="arcade-stat-value" id="arcadeBest">0</span>
+                <span class="arcade-stat-value" id="stackBest">0</span>
               </div>
             </div>
             <p class="arcade-hint">
-              <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or
-              <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to move &middot; <kbd>Space</kbd> to pause
-              &middot; on mobile, swipe
+              <kbd>Click</kbd> or <kbd>Space</kbd> to drop &middot; land it dead-centre for a
+              <span class="arcade-hint-em">perfect</span> streak
             </p>
           </div>
         </div>

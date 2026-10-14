@@ -638,25 +638,13 @@ section {
 .arcade-demo {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 360px) 1fr;
-  gap: 32px;
+  grid-template-columns: minmax(0, 420px) 1fr;
+  gap: 36px;
   align-items: center;
   padding: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-}
-
-.arcade-demo--reverse {
-  grid-template-columns: 1fr minmax(0, 360px);
-}
-
-.arcade-demo--reverse .arcade-demo-info {
-  order: 1;
-}
-
-.arcade-demo--reverse .arcade-demo-screen {
-  order: 2;
 }
 
 .arcade-demo-screen {
@@ -757,6 +745,11 @@ section {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 4px;
+}
+
+.arcade-hint-em {
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* ---------- Skills ---------- */
@@ -1114,12 +1107,9 @@ section {
   }
 
   .arcade-demo-screen {
-    max-width: 340px;
-  }
-
-  .arcade-demo--reverse .arcade-demo-info,
-  .arcade-demo--reverse .arcade-demo-screen {
-    order: 0;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
   }
 }
 

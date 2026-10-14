@@ -154,472 +154,430 @@
   });
 })();
 
-/* ---------- Playable Snake (arcade demo) ---------- */
+/* ---------- Stack: hand-coded 3D tower game ----------
+   A tiny software 3D renderer (isometric projection, painter's
+   depth sorting, flat shading, glowing edges) plus simple physics.
+   No engine, no libraries.                                          */
 (() => {
-  const canvas = document.getElementById('snakeCanvas');
+  const canvas = document.getElementById('stackCanvas');
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  const overlay = document.getElementById('arcadeOverlay');
-  const startBtn = document.getElementById('arcadeStart');
-  const scoreEl = document.getElementById('arcadeScore');
-  const bestEl = document.getElementById('arcadeBest');
-
-  const COLS = 20;
-  const ROWS = 20;
-  const CELL = canvas.width / COLS;
-
-  let snake, dir, nextDir, food, score, speed, running = false, paused = false;
-
-  let best = 0;
-  try { best = Number(localStorage.getItem('snake-best')) || 0; } catch (e) {}
-  bestEl.textContent = best;
-
-  const readVar = (name) =>
-    getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
-  const palette = () => ({
-    bg: readVar('--surface-2'),
-    grid: readVar('--border'),
-    snake: readVar('--accent'),
-    head: readVar('--accent-strong'),
-    food: readVar('--text')
-  });
-
-  function reset() {
-    snake = [{ x: 9, y: 10 }, { x: 8, y: 10 }, { x: 7, y: 10 }];
-    dir = { x: 1, y: 0 };
-    nextDir = dir;
-    score = 0;
-    speed = 140;
-    paused = false;
-    placeFood();
-    scoreEl.textContent = score;
-    draw();
-  }
-
-  function placeFood() {
-    let p;
-    do {
-      p = { x: (Math.random() * COLS) | 0, y: (Math.random() * ROWS) | 0 };
-    } while (snake.some((s) => s.x === p.x && s.y === p.y));
-    food = p;
-  }
-
-  function roundRect(x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  function draw() {
-    const c = palette();
-    ctx.fillStyle = c.bg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = c.grid;
-    ctx.lineWidth = 1;
-    for (let i = 1; i < COLS; i++) {
-      ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
-    }
-
-    ctx.fillStyle = c.food;
-    roundRect(food.x * CELL + 3, food.y * CELL + 3, CELL - 6, CELL - 6, 3);
-
-    snake.forEach((s, i) => {
-      ctx.fillStyle = i === 0 ? c.head : c.snake;
-      roundRect(s.x * CELL + 2, s.y * CELL + 2, CELL - 4, CELL - 4, i === 0 ? 6 : 4);
-    });
-  }
-
-  function schedule() {
-    clearTimeout(schedule.id);
-    schedule.id = setTimeout(step, speed);
-  }
-
-  function step() {
-    if (!running || paused) return;
-    dir = nextDir;
-
-    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-    const hitWall = head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS;
-    const hitSelf = snake.some((s) => s.x === head.x && s.y === head.y);
-    if (hitWall || hitSelf) return gameOver();
-
-    snake.unshift(head);
-    if (head.x === food.x && head.y === food.y) {
-      score += 1;
-      scoreEl.textContent = score;
-      if (score % 5 === 0 && speed > 70) speed -= 12;
-      placeFood();
-    } else {
-      snake.pop();
-    }
-    draw();
-    schedule();
-  }
-
-  function showOverlay(title, text, label) {
-    overlay.querySelector('.arcade-overlay-title').textContent = title;
-    overlay.querySelector('.arcade-overlay-text').textContent = text;
-    startBtn.textContent = label;
-    overlay.classList.remove('hidden');
-  }
-
-  function gameOver() {
-    running = false;
-    if (score > best) {
-      best = score;
-      bestEl.textContent = best;
-      try { localStorage.setItem('snake-best', best); } catch (e) {}
-    }
-    showOverlay('Game over', 'Score ' + score, 'Play again');
-  }
-
-  function start() {
-    overlay.classList.add('hidden');
-    reset();
-    running = true;
-    schedule();
-  }
-
-  function setDir(x, y) {
-    if (x === -dir.x && y === -dir.y) return;
-    nextDir = { x, y };
-  }
-
-  const KEYS = {
-    ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0],
-    w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0]
-  };
-
-  window.addEventListener('keydown', (e) => {
-    if (!running) return;
-    const move = KEYS[e.key] || KEYS[e.key.toLowerCase()];
-    if (move) {
-      e.preventDefault();
-      setDir(move[0], move[1]);
-    } else if (e.key === ' ') {
-      e.preventDefault();
-      paused = !paused;
-      if (!paused) schedule();
-    }
-  });
-
-  startBtn.addEventListener('click', start);
-
-  let touchStart = null;
-  canvas.addEventListener('touchstart', (e) => {
-    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  }, { passive: true });
-
-  canvas.addEventListener('touchmove', (e) => {
-    if (!touchStart || !running) return;
-    const dx = e.touches[0].clientX - touchStart.x;
-    const dy = e.touches[0].clientY - touchStart.y;
-    if (Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
-    if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 1 : -1, 0);
-    else setDir(0, dy > 0 ? 1 : -1);
-    touchStart = null;
-  }, { passive: true });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) paused = true;
-  });
-
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting && running) paused = true;
-      });
-    }, { threshold: 0 }).observe(canvas);
-  }
-
-  new MutationObserver(() => { if (!running) draw(); })
-    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-  reset();
-  showOverlay('Snake', 'Arrow keys or WASD to play', 'Play');
-})();
-
-/* ---------- "It's not a bug, it's a feature" (arcade demo) ---------- */
-(() => {
-  const canvas = document.getElementById('bugCanvas');
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  const overlay = document.getElementById('bugOverlay');
-  const startBtn = document.getElementById('bugStart');
-  const scoreEl = document.getElementById('bugScore');
-  const livesEl = document.getElementById('bugLives');
-  const bestEl = document.getElementById('bugBest');
-  const quipEl = document.getElementById('bugQuip');
+  const overlay = document.getElementById('stackOverlay');
+  const startBtn = document.getElementById('stackStart');
+  const scoreEl = document.getElementById('stackScore');
+  const bestEl = document.getElementById('stackBest');
 
   const W = canvas.width;
   const H = canvas.height;
-  const FEATURE_COLOR = '#F59E0B';
-  const MAX_LIVES = 3;
+  const CX = W / 2;
+  const CY = H * 0.60;
+  const K = 84;
+  const RANGE = 1.12;
+  const HEIGHT = 1;
+  const PERFECT = 0.1;
 
-  const QUIPS = [
-    'Works on my machine.',
-    'Have you tried turning it off and on again?',
-    'git commit -m "fixed the bug"',
-    'Shipping it anyway.'
-  ];
+  const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 
-  let PAL;
-  const refreshPal = () => {
+  const parseColor = (str) => {
+    str = (str || '').trim();
+    if (str[0] === '#') {
+      let h = str.slice(1);
+      if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+      const n = parseInt(h, 16);
+      return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    }
+    const m = str.match(/rgba?\(([^)]+)\)/);
+    if (m) {
+      const p = m[1].split(',').map((s) => parseFloat(s));
+      return { r: p[0], g: p[1], b: p[2] };
+    }
+    return { r: 56, g: 189, b: 248 };
+  };
+
+  const shade = (c, f, a) => {
+    const r = clamp(Math.round(c.r * f), 0, 255);
+    const g = clamp(Math.round(c.g * f), 0, 255);
+    const b = clamp(Math.round(c.b * f), 0, 255);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + (a === undefined ? 1 : a) + ')';
+  };
+
+  let COL;
+  const refreshColors = () => {
     const cs = getComputedStyle(document.documentElement);
-    PAL = {
-      bg: cs.getPropertyValue('--surface-2').trim(),
-      grid: cs.getPropertyValue('--border').trim(),
-      bug: cs.getPropertyValue('--accent').trim(),
-      body: cs.getPropertyValue('--accent-strong').trim(),
-      text: cs.getPropertyValue('--text').trim()
+    COL = {
+      accent: parseColor(cs.getPropertyValue('--accent')),
+      strong: parseColor(cs.getPropertyValue('--accent-strong')),
+      bg: cs.getPropertyValue('--surface-2').trim() || '#171B22'
     };
   };
-  refreshPal();
+  refreshColors();
 
-  let items = [];
-  let splats = [];
-  let score = 0;
-  let lives = MAX_LIVES;
-  let clock = 0;
-  let nextSpawn = 0;
+  /* --- world state --- */
+  let blocks, debris, particles;
+  let moving, level, movePos, moveDir, moveSpeed;
+  let focusY, focusTarget, combo, flash, perfMsg, score;
+  let running = false, frozen = false, over = false, dead = false;
   let lastTs = 0;
-  let running = false;
-  let frozen = false;
 
   let best = 0;
-  try { best = Number(localStorage.getItem('bug-best')) || 0; } catch (e) {}
+  try { best = Number(localStorage.getItem('stack-best')) || 0; } catch (e) {}
   bestEl.textContent = best;
 
-  const pickQuip = () => QUIPS[(Math.random() * QUIPS.length) | 0];
+  /* --- isometric projection --- */
+  const project = (x, y, z) => ({
+    x: CX + (x - z) * K,
+    y: CY + (focusY - y) * K + (x + z) * 0.5 * K
+  });
 
-  function spawn() {
-    const isFeature = Math.random() < 0.22;
-    const r = 20;
-    const m = r + 20;
-    items.push({
-      x: m + Math.random() * (W - m * 2),
-      y: m + Math.random() * (H - m * 2),
-      type: isFeature ? 'feature' : 'bug',
-      born: clock,
-      life: (isFeature ? 2300 : 1550) * (1 - 0.35 * Math.min(1, clock / 45000)),
-      r,
-      angle: Math.random() * Math.PI * 2
-    });
-  }
+  const depth = (b) => b.x + b.z + b.y;
 
-  function loseLife(reason) {
-    lives -= 1;
-    livesEl.textContent = Math.max(0, lives);
-    quipEl.textContent = reason === 'feature'
-      ? "It's not a bug, it's a feature!"
-      : 'A bug slipped through the build...';
-    if (lives <= 0) gameOver();
-  }
+  const topQuad = (b) => {
+    const x0 = b.x - b.sx / 2, x1 = b.x + b.sx / 2;
+    const z0 = b.z - b.sz / 2, z1 = b.z + b.sz / 2;
+    const y1 = b.y + HEIGHT;
+    return [
+      project(x0, y1, z0),
+      project(x1, y1, z0),
+      project(x1, y1, z1),
+      project(x0, y1, z1)
+    ];
+  };
 
-  function gameOver() {
-    running = false;
+  const trace = (pts) => {
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i++) {
+      if (i) ctx.lineTo(pts[i].x, pts[i].y);
+      else ctx.moveTo(pts[i].x, pts[i].y);
+    }
+    ctx.closePath();
+  };
+
+  const fillQuad = (pts, color) => {
+    trace(pts);
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
+
+  /* --- spawn --- */
+  const spawnMoving = () => {
+    const last = blocks[blocks.length - 1];
+    const axis = level % 2 === 0 ? 'x' : 'z';
+    moveSpeed = 1.35 + Math.min(1.15, level * 0.05);
+    moveDir = 1;
+    movePos = -RANGE;
+    moving = {
+      x: last.x, z: last.z, sx: last.sx, sz: last.sz,
+      y: level, axis: axis, base: axis === 'x' ? last.x : last.z
+    };
+    if (axis === 'x') moving.x = movePos; else moving.z = movePos;
+    focusTarget = level - 0.9;
+  };
+
+  /* --- perfect burst --- */
+  const burst = (b) => {
+    const top = b.y + HEIGHT;
+    for (let i = 0; i < 18; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 0.7 + Math.random() * 1.7;
+      particles.push({
+        x: b.x + (Math.random() - 0.5) * b.sx,
+        y: top + 0.08,
+        z: b.z + (Math.random() - 0.5) * b.sz,
+        vx: Math.cos(a) * sp,
+        vz: Math.sin(a) * sp,
+        vy: 1.6 + Math.random() * 2.4,
+        life: 1,
+        max: 1
+      });
+    }
+  };
+
+  /* --- drop the active block --- */
+  const drop = () => {
+    if (!running || !moving || over) return;
+    const last = blocks[blocks.length - 1];
+    const axis = moving.axis;
+    const mc = axis === 'x' ? moving.x : moving.z;
+    const ms = axis === 'x' ? moving.sx : moving.sz;
+    const pc = axis === 'x' ? last.x : last.z;
+    const ps = axis === 'x' ? last.sx : last.sz;
+
+    const lo = Math.max(pc - ps / 2, mc - ms / 2);
+    const hi = Math.min(pc + ps / 2, mc + ms / 2);
+    const ov = hi - lo;
+
+    if (ov <= 0.001) { crash(); return; }
+
+    const perfect = Math.abs(mc - pc) < PERFECT;
+    const placed = { x: moving.x, z: moving.z, sx: moving.sx, sz: moving.sz, y: moving.y };
+
+    if (perfect) {
+      if (axis === 'x') placed.x = pc; else placed.z = pc;
+      combo += 1;
+      flash = 1;
+      perfMsg = { t: 1, text: combo > 1 ? 'PERFECT \u00d7' + combo : 'PERFECT' };
+      burst(placed);
+    } else {
+      const cutSize = ms - ov;
+      const cutCenter = mc > pc
+        ? (hi + (mc + ms / 2)) / 2
+        : ((mc - ms / 2) + lo) / 2;
+      const piece = {
+        x: placed.x, z: placed.z, sx: placed.sx, sz: placed.sz,
+        y: placed.y, vy: 0, life: 1
+      };
+      if (axis === 'x') { piece.x = cutCenter; piece.sx = cutSize; }
+      else { piece.z = cutCenter; piece.sz = cutSize; }
+      piece.vy = 0.4 + Math.random() * 0.4;
+      debris.push(piece);
+
+      if (axis === 'x') { placed.x = (lo + hi) / 2; placed.sx = ov; }
+      else { placed.z = (lo + hi) / 2; placed.sz = ov; }
+      combo = 0;
+    }
+
+    blocks.push(placed);
+    level += 1;
+    score = level - 1;
+    scoreEl.textContent = score;
+    moving = null;
+    spawnMoving();
+  };
+
+  const crash = () => {
+    const m = moving;
+    debris.push({ x: m.x, z: m.z, sx: m.sx, sz: m.sz, y: m.y, vy: 0.6, life: 1 });
+    moving = null;
+    over = true;
+    dead = true;
     if (score > best) {
       best = score;
       bestEl.textContent = best;
-      try { localStorage.setItem('bug-best', best); } catch (e) {}
+      try { localStorage.setItem('stack-best', best); } catch (e) {}
     }
-    showOverlay('Build failed', 'Squashed ' + score + ' \u00b7 ' + pickQuip(), 'Rebuild');
-  }
-
-  function squash(x, y) {
-    for (let i = items.length - 1; i >= 0; i--) {
-      const it = items[i];
-      if (Math.hypot(it.x - x, it.y - y) > it.r * 1.25) continue;
-      items.splice(i, 1);
-      if (it.type === 'bug') {
-        score += 1;
-        scoreEl.textContent = score;
-        splats.push({ x: it.x, y: it.y, t: clock, color: PAL.bug });
-      } else {
-        splats.push({ x: it.x, y: it.y, t: clock, color: FEATURE_COLOR });
-        loseLife('feature');
+    window.setTimeout(() => {
+      if (dead) {
+        running = false;
+        showOverlay('Tower collapsed', 'You stacked ' + score + ' high', 'Build again');
       }
-      return;
-    }
-  }
+    }, 720);
+  };
 
-  function drawBug(x, y, r, angle, c) {
+  /* --- simulation --- */
+  const update = (dt) => {
+    const s = dt / 1000;
+    if (running && moving && !over) {
+      movePos += moveDir * moveSpeed * s;
+      if (movePos > RANGE) { movePos = RANGE; moveDir = -1; }
+      if (movePos < -RANGE) { movePos = -RANGE; moveDir = 1; }
+      if (moving.axis === 'x') moving.x = movePos; else moving.z = movePos;
+    }
+
+    focusY += (focusTarget - focusY) * Math.min(1, dt / 140);
+    if (flash > 0) flash = Math.max(0, flash - s * 2.4);
+    if (perfMsg) { perfMsg.t -= s * 1.6; if (perfMsg.t <= 0) perfMsg = null; }
+
+    for (let i = debris.length - 1; i >= 0; i--) {
+      const d = debris[i];
+      d.vy -= 20 * s;
+      d.y += d.vy * s;
+      d.life -= s * 0.42;
+      if (d.y < focusY - 12 || d.life <= 0) debris.splice(i, 1);
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.vy -= 8 * s;
+      p.x += p.vx * s; p.y += p.vy * s; p.z += p.vz * s;
+      p.life -= s * 1.1;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+    if (particles.length > 120) particles.splice(0, particles.length - 120);
+  };
+
+  /* --- drawing --- */
+  const drawFloor = () => {
+    const R = 5;
+    ctx.strokeStyle = shade(COL.accent, 0.75, 0.09);
+    ctx.lineWidth = 1;
+    for (let i = -R; i <= R; i++) {
+      let a = project(i, 0, -R), b = project(i, 0, R);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      a = project(-R, 0, i); b = project(R, 0, i);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+  };
+
+  const drawBox = (b, alpha) => {
+    const x0 = b.x - b.sx / 2, x1 = b.x + b.sx / 2;
+    const z0 = b.z - b.sz / 2, z1 = b.z + b.sz / 2;
+    const y0 = b.y, y1 = b.y + HEIGHT;
+
+    const bright = 0.72 + 0.34 * Math.sin(b.y * 0.5 + 0.4);
+    const c = COL.accent;
+
+    fillQuad([
+      project(x0, y1, z1), project(x1, y1, z1), project(x1, y0, z1), project(x0, y0, z1)
+    ], shade(c, clamp(bright * 0.58, 0.22, 0.85), alpha));
+
+    fillQuad([
+      project(x1, y1, z0), project(x1, y1, z1), project(x1, y0, z1), project(x1, y0, z0)
+    ], shade(c, clamp(bright * 0.86, 0.34, 1.05), alpha));
+
+    fillQuad([
+      project(x0, y1, z0), project(x1, y1, z0), project(x1, y1, z1), project(x0, y1, z1)
+    ], shade(c, clamp(bright, 0.45, 1.2), alpha));
+
     ctx.save();
-    ctx.translate(x, y);
-    ctx.strokeStyle = c.body;
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    for (const side of [-1, 1]) {
-      for (const off of [-0.55, 0, 0.55]) {
-        ctx.beginPath();
-        ctx.moveTo(0, off * r * 0.7);
-        ctx.lineTo(side * r * 1.3, off * r * 1.05 + Math.sin(angle * 6 + off) * 1.5);
-        ctx.stroke();
-      }
-    }
-    ctx.fillStyle = c.body;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, r * 0.72, r, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = c.bug;
-    ctx.beginPath();
-    ctx.arc(0, -r * 0.85, r * 0.42, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = c.bug;
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.28, -r * 1.12); ctx.lineTo(-r * 0.6, -r * 1.5);
-    ctx.moveTo(r * 0.28, -r * 1.12); ctx.lineTo(r * 0.6, -r * 1.5);
+    ctx.shadowColor = shade(c, 1.4, 0.85 * alpha);
+    ctx.shadowBlur = 11;
+    ctx.strokeStyle = shade(c, 1.55, 0.9 * alpha);
+    ctx.lineWidth = 1.5;
+    trace(topQuad(b));
     ctx.stroke();
-    ctx.fillStyle = c.bg;
-    ctx.beginPath(); ctx.arc(-r * 0.16, -r * 0.92, r * 0.1, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(r * 0.16, -r * 0.92, r * 0.1, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
-  }
+  };
 
-  function drawStar(cx, cy, r, color) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    const spikes = 5;
-    const outer = r * 1.05;
-    const inner = r * 0.46;
-    for (let i = 0; i < spikes * 2; i++) {
-      const rad = i % 2 ? inner : outer;
-      const a = (Math.PI / spikes) * i - Math.PI / 2;
-      const px = Math.cos(a) * rad;
-      const py = Math.sin(a) * rad;
-      if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+  const drawParticles = () => {
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      const s = project(p.x, p.y, p.z);
+      const a = Math.max(0, p.life);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = shade(COL.accent, 1.7, 1);
+      ctx.shadowColor = shade(COL.accent, 1.4, 0.9);
+      ctx.shadowBlur = 9;
+      const sz = 2.5 + 4 * a;
+      ctx.fillRect(s.x - sz / 2, s.y - sz / 2, sz, sz);
     }
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  };
 
-  function render() {
-    ctx.fillStyle = PAL.bg;
+  const render = () => {
+    ctx.fillStyle = COL.bg;
     ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = PAL.grid;
-    ctx.lineWidth = 1;
-    const cols = 16;
-    const step = W / cols;
-    for (let i = 1; i < cols; i++) {
-      ctx.beginPath(); ctx.moveTo(i * step, 0); ctx.lineTo(i * step, H); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, i * step); ctx.lineTo(W, i * step); ctx.stroke();
-    }
+    const g = ctx.createRadialGradient(CX, CY - 30, 8, CX, CY - 10, W * 0.62);
+    g.addColorStop(0, shade(COL.accent, 1, 0.17));
+    g.addColorStop(1, shade(COL.accent, 1, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
 
-    splats.forEach((s) => {
-      const k = (clock - s.t) / 350;
-      ctx.globalAlpha = Math.max(0, 1 - k);
-      ctx.strokeStyle = s.color;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, 12 + k * 26, 0, Math.PI * 2);
+    drawFloor();
+
+    const items = [];
+    for (const b of blocks) {
+      const sc = project(b.x, b.y, b.z);
+      if (sc.y - K * 1.6 > H || sc.y < -K * 6) continue;
+      items.push({ b: b, a: 1 });
+    }
+    for (const d of debris) {
+      const sc = project(d.x, d.y, d.z);
+      if (sc.y - K * 1.6 > H || sc.y < -K * 8) continue;
+      items.push({ b: d, a: clamp(d.life, 0, 1) });
+    }
+    items.sort((A, B) => depth(A.b) - depth(B.b));
+    for (const it of items) drawBox(it.b, it.a);
+
+    if (moving) drawBox(moving, 1);
+
+    drawParticles();
+
+    if (flash > 0 && blocks.length) {
+      const b = blocks[blocks.length - 1];
+      ctx.save();
+      ctx.globalAlpha = clamp(flash, 0, 1) * 0.85;
+      ctx.shadowColor = shade(COL.accent, 1.6, 1);
+      ctx.shadowBlur = 26;
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.85 * clamp(flash, 0, 1)) + ')';
+      ctx.lineWidth = 2.5;
+      trace(topQuad(b));
       ctx.stroke();
-    });
-    ctx.globalAlpha = 1;
-
-    items.forEach((it) => {
-      const remain = 1 - (clock - it.born) / it.life;
-      ctx.strokeStyle = it.type === 'feature' ? FEATURE_COLOR : PAL.bug;
-      ctx.globalAlpha = 0.45;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(it.x, it.y, it.r + 9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, remain));
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-      if (it.type === 'feature') drawStar(it.x, it.y, it.r, FEATURE_COLOR);
-      else drawBug(it.x, it.y, it.r, it.angle, PAL);
-    });
-  }
-
-  function update(dt) {
-    nextSpawn -= dt;
-    if (nextSpawn <= 0) {
-      spawn();
-      const difficulty = Math.min(1, clock / 45000);
-      nextSpawn = (820 - 380 * difficulty) + Math.random() * 260;
+      ctx.restore();
     }
 
-    for (let i = items.length - 1; i >= 0; i--) {
-      const it = items[i];
-      if (clock - it.born >= it.life) {
-        items.splice(i, 1);
-        if (it.type === 'bug') {
-          loseLife('escape');
-          if (!running) return;
-        }
-      } else {
-        it.angle += dt * 0.0016;
-      }
+    if (perfMsg) {
+      const b = blocks[blocks.length - 1];
+      const p = project(b.x, b.y + 1.1, b.z);
+      ctx.save();
+      ctx.globalAlpha = clamp(perfMsg.t, 0, 1);
+      ctx.fillStyle = shade(COL.accent, 1.75, 1);
+      ctx.font = '700 17px Inter, system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = shade(COL.accent, 1.4, 0.9);
+      ctx.shadowBlur = 12;
+      ctx.fillText(perfMsg.text, p.x, p.y - (1 - perfMsg.t) * 30);
+      ctx.restore();
     }
+  };
 
-    splats = splats.filter((s) => clock - s.t < 350);
-  }
-
-  function loop(ts) {
+  /* --- loop --- */
+  const loop = (ts) => {
     if (!running) return;
-    const dt = Math.min(48, ts - lastTs);
+    let dt = ts - lastTs;
     lastTs = ts;
-    if (frozen) {
-      requestAnimationFrame(loop);
-      return;
+    if (dt < 0) dt = 0;
+    if (dt > 60) dt = 60;
+    if (!frozen) {
+      update(dt);
+      render();
     }
-    clock += dt;
-    update(dt);
-    render();
     if (running) requestAnimationFrame(loop);
-  }
+  };
 
-  function showOverlay(title, text, label) {
+  /* --- ui --- */
+  const showOverlay = (title, text, label) => {
     overlay.querySelector('.arcade-overlay-title').textContent = title;
     overlay.querySelector('.arcade-overlay-text').textContent = text;
     startBtn.textContent = label;
     overlay.classList.remove('hidden');
-  }
+  };
 
-  function reset() {
-    items = [];
-    splats = [];
+  const reset = () => {
+    blocks = [{ x: 0, z: 0, sx: 1, sz: 1, y: 0 }];
+    debris = [];
+    particles = [];
+    level = 1;
+    combo = 0;
+    flash = 0;
+    perfMsg = null;
     score = 0;
-    lives = MAX_LIVES;
-    clock = 0;
-    nextSpawn = 500;
-    frozen = false;
-    scoreEl.textContent = score;
-    livesEl.textContent = lives;
-    quipEl.textContent = 'Bugs: click to fix \u00b7 Features: hands off';
-    refreshPal();
+    over = false;
+    dead = false;
+    focusY = level - 0.9;
+    focusTarget = level - 0.9;
+    scoreEl.textContent = '0';
+    refreshColors();
+    spawnMoving();
     render();
-  }
+  };
 
-  function start() {
+  const start = () => {
+    startBtn.blur();
     overlay.classList.add('hidden');
     reset();
+    frozen = false;
     running = true;
     lastTs = performance.now();
     requestAnimationFrame(loop);
-  }
+  };
 
   startBtn.addEventListener('click', start);
 
   canvas.addEventListener('pointerdown', (e) => {
-    if (!running) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (W / rect.width);
-    const y = (e.clientY - rect.top) * (H / rect.height);
-    squash(x, y);
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (running && moving && !over) { e.preventDefault(); drop(); }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.key === ' ' || e.key === 'Enter') && running && moving && !over) {
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON') return;
+      e.preventDefault();
+      drop();
+    }
   });
 
   if ('IntersectionObserver' in window) {
@@ -628,9 +586,14 @@
     }, { threshold: 0 }).observe(canvas);
   }
 
-  new MutationObserver(() => { refreshPal(); if (!running) render(); })
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) frozen = true;
+    else frozen = false;
+  });
+
+  new MutationObserver(() => { refreshColors(); if (!running) render(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   reset();
-  showOverlay('Squash the Bugs', 'Fix the bugs. Never touch a feature.', 'Play');
+  showOverlay('Stack', 'Drop each block on the one below.', 'Play');
 })();
