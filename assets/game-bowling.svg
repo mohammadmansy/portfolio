@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Bowling">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#191E26" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#0E1116"/>
+  <rect width="800" height="450" fill="url(#g)"/>
+  <text x="34" y="46" fill="#6B7280" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" letter-spacing="2.4">2D BOWLING GAME</text>
+  <g transform="translate(260.5 135.0) scale(1.3950)">
+
+    <rect x="88" y="116" width="13" height="36" rx="6.5" fill="none" stroke="#38BDF8" stroke-width="3"/>
+    <rect x="70" y="90" width="13" height="36" rx="6.5" fill="none" stroke="#38BDF8" stroke-width="3"/>
+    <rect x="106" y="90" width="13" height="36" rx="6.5" fill="none" stroke="#38BDF8" stroke-width="3"/>
+    <circle cx="150" cy="132" r="13" fill="none" stroke="#59616E" stroke-width="3"/>
+    <circle cx="146" cy="128" r="2" fill="#59616E"/>
+    <circle cx="154" cy="128" r="2" fill="#59616E"/>
+    <circle cx="150" cy="136" r="2" fill="#59616E"/>
+  </g>
+  <rect x="34" y="398" width="22" height="3" rx="1.5" fill="#38BDF8"/>
+  <text x="34" y="424" fill="#8A93A0" font-family="Inter, system-ui, sans-serif" font-size="21" font-weight="600" letter-spacing="0.2">Bowling</text>
+</svg>

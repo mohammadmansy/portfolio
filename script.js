@@ -74,11 +74,13 @@
   revealEls.forEach(el => el.classList.add('reveal'));
 
   const revealObserver = new IntersectionObserver((entries) => {
+    let i = 0;
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target);
-      }
+      if (!entry.isIntersecting) return;
+      entry.target.style.transitionDelay = Math.min(i, 6) * 70 + 'ms';
+      i += 1;
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -48px 0px' });
 

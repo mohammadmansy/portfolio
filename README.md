@@ -10,7 +10,10 @@ Drop your file into this folder under the exact name below and the site updates 
 | --- | --- | --- |
 | Your photo | `assets/profile2.jpg` | Hero avatar, browser tab favicon, link preview (OG/Twitter) |
 | CV / resume | `cv/CV.pdf` | "Download CV" button + projects note link |
-| Project screenshots | — | Replace the `placehold.co` URLs in `index.html` with real images in `assets/` |
+| Project covers | `assets/work-*.svg`, `assets/game-*.svg` | Project + game artwork (placeholder covers — replace with real screenshots) |
+
+The covers in `assets/` are lightweight SVG placeholders drawn to match the site. To use a real
+screenshot, drop the image in `assets/` and point the matching `<img src="...">` in `index.html` at it.
 
 If you want a photo that is only used for one spot (e.g. a square favicon only), add a new file
 like `assets/favicon.jpg` and change the one matching line in `index.html`.

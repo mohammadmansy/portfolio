@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Rat Runner">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#191E26" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#0E1116"/>
+  <rect width="800" height="450" fill="url(#g)"/>
+  <text x="34" y="46" fill="#6B7280" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" letter-spacing="2.4">2D RUNNER GAME</text>
+  <g transform="translate(260.5 135.0) scale(1.3950)">
+
+    <path d="M92 72l46 28-46 28z" fill="none" stroke="#38BDF8" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M28 74h46 M16 100h56 M28 126h46" fill="none" stroke="#59616E" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <rect x="34" y="398" width="22" height="3" rx="1.5" fill="#38BDF8"/>
+  <text x="34" y="424" fill="#8A93A0" font-family="Inter, system-ui, sans-serif" font-size="21" font-weight="600" letter-spacing="0.2">Rat Runner</text>
+</svg>
