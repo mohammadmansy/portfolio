@@ -185,6 +185,40 @@
           </div>
         </article>
 
+        <div class="arcade-demo">
+          <div class="arcade-demo-screen">
+            <canvas id="snakeCanvas" width="480" height="480" aria-label="Playable Snake game"></canvas>
+            <div class="arcade-overlay" id="arcadeOverlay">
+              <p class="arcade-overlay-title">Snake</p>
+              <p class="arcade-overlay-text">Arrow keys or WASD to play</p>
+              <button class="btn btn-primary" id="arcadeStart" type="button">Play</button>
+            </div>
+          </div>
+          <div class="arcade-demo-info">
+            <p class="project-meta">Played in your browser</p>
+            <h3 class="game-title">Try Snake right here</h3>
+            <p class="project-desc">
+              A real, playable game &mdash; hand-coded on canvas with plain JavaScript, no engine and no
+              dependencies. Same classic loop I rebuild in Unity, running live on this page.
+            </p>
+            <div class="arcade-stats">
+              <div class="arcade-stat">
+                <span class="arcade-stat-label">Score</span>
+                <span class="arcade-stat-value" id="arcadeScore">0</span>
+              </div>
+              <div class="arcade-stat">
+                <span class="arcade-stat-label">Best</span>
+                <span class="arcade-stat-value" id="arcadeBest">0</span>
+              </div>
+            </div>
+            <p class="arcade-hint">
+              <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or
+              <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to move &middot; <kbd>Space</kbd> to pause
+              &middot; on mobile, swipe
+            </p>
+          </div>
+        </div>
+
         <div class="collection-games">
           <div class="collection-game">
             <div class="game-media">

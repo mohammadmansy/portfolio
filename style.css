@@ -634,6 +634,119 @@ section {
   font-size: 0.8125rem;
 }
 
+/* ---------- Playable arcade demo ---------- */
+.arcade-demo {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 360px) 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.arcade-demo-screen {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.arcade-demo-screen canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.arcade-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  background: var(--surface-2);
+  transition: opacity 0.2s ease;
+}
+
+.arcade-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.arcade-overlay-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.arcade-overlay-text {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.arcade-demo-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.arcade-stats {
+  display: flex;
+  gap: 32px;
+  margin: 18px 0;
+}
+
+.arcade-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.arcade-stat-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.arcade-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.arcade-hint {
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: var(--text-3);
+}
+
+.arcade-hint kbd {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 6px;
+  font-family: var(--font);
+  font-size: 0.6875rem;
+  text-align: center;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
 /* ---------- Skills ---------- */
 .skills-grid {
   display: grid;
@@ -981,6 +1094,15 @@ section {
 
   .collection-games {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .arcade-demo {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .arcade-demo-screen {
+    max-width: 340px;
   }
 }
 
