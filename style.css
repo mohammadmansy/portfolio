@@ -886,6 +886,33 @@ section {
   font-weight: 600;
 }
 
+.play-standalone {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 160ms var(--ease);
+}
+
+.play-standalone::after {
+  content: "\2192";
+  transition: transform 160ms var(--ease);
+}
+
+.play-standalone:hover,
+.play-standalone:focus-visible {
+  color: var(--text);
+}
+
+.play-standalone:hover::after {
+  transform: translateX(3px);
+}
+
 /* ---------- Skills ---------- */
 .skills-grid {
   display: grid;

@@ -1,0 +1,66 @@
+{
+  "name": "stack-game",
+  "version": "1.0.0",
+  "description": "Stack — a fast one-tap 3D tower builder. Standalone, installable (PWA) and wrappable for Android, iOS and desktop.",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "verify": "node scripts/verify.mjs",
+    "dev": "npm run build && npx --yes serve@14 www -l 4173",
+    "start": "npm run build && npx --yes serve@14 www -l 4173",
+    "build:android": "npm run build && npx cap sync android",
+    "build:ios": "npm run build && npx cap sync ios",
+    "sync:android": "npx cap sync android",
+    "sync:ios": "npx cap sync ios",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios",
+    "desktop:dev": "npm run build && electron .",
+    "desktop:win": "npm run build && electron-builder --win",
+    "desktop:mac": "npm run build && electron-builder --mac",
+    "desktop:linux": "npm run build && electron-builder --linux",
+    "desktop:build": "npm run build && electron-builder"
+  },
+  "keywords": ["game", "pwa", "stack", "tower", "canvas"],
+  "author": "Mohamed Mansy",
+  "license": "MIT",
+  "devDependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/ios": "^6.1.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.mohammadmansy.stack",
+    "productName": "Stack",
+    "files": [
+      "electron/**/*",
+      "www/**/*",
+      "package.json",
+      "!**/node_modules/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "icons/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "icons/icon-512.png",
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "icons/icon-512.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

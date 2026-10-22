@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Stack — a fast one-tap 3D tower builder. Drop each block perfectly to keep your tower growing." />
+  <title>Stack — 3D Tower Builder</title>
+
+  <!-- ---------- PWA / installable ---------- -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0B0E13" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Stack" />
+
+  <link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <span class="brand">Stack</span>
+      <div class="controls">
+        <button id="soundBtn" class="icon-btn" type="button"
+                aria-pressed="true" aria-label="Mute sound">
+          <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z"></path>
+            <path d="M15.5 8.6a5 5 0 0 1 0 6.8"></path>
+            <path d="M18.6 5.5a9 9 0 0 1 0 13"></path>
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z"></path>
+            <path d="m16 9 4 6"></path>
+            <path d="m20 9-4 6"></path>
+          </svg>
+        </button>
+        <button id="hapticsBtn" class="icon-btn" type="button"
+                aria-pressed="true" aria-label="Disable haptics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="7" y="3" width="10" height="18" rx="2"></rect>
+            <path d="M11 18h2"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="hud" aria-live="polite">
+      <div class="stat">
+        <span class="stat-label">Height</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Best</span>
+        <span class="stat-value" id="best">0</span>
+      </div>
+    </section>
+
+    <div class="stage">
+      <canvas id="gameCanvas" aria-label="Stack game"></canvas>
+
+      <div class="level-up" id="levelUp" aria-hidden="true"></div>
+      <div class="level-flash" id="levelFlash" aria-hidden="true"></div>
+
+      <div class="overlay" id="overlay">
+        <h1 class="overlay-title" id="overlayTitle">Stack</h1>
+        <p class="overlay-text" id="overlayText">Build the tower as high as you can.</p>
+        <p class="overlay-sub" id="overlaySub">Tap or press Space to drop.</p>
+        <div class="overlay-actions">
+          <button id="primaryBtn" class="btn btn-primary" type="button">Play</button>
+          <button id="menuBtn" class="btn btn-ghost" type="button" hidden>Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="hint">Tap or press Space to drop</p>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+  <script>
+    // The service worker is for the hosted (WebGL/PWA) build only.
+    // Inside Capacitor the assets are already bundled, and a cached
+    // copy would just fight the native updater.
+    if ('serviceWorker' in navigator &&
+        !window.Capacitor &&
+        /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+# dependencies / tooling
+node_modules/
+.npm/
+
+# build output
+www/
+dist/
+release/
+*.tsbuildinfo
+
+# NOTE: android/ and ios/ are NOT ignored — once `npx cap add` creates
+# them they become source code (permissions, icons, versionCode, signing)
+# and must be committed. Only regenerate them by deleting and re-adding.
+
+# electron-builder artefacts
+*.AppImage
+*.deb
+*.dmg
+*.blockmap
+out/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.log
+npm-debug.log*
+
+# temporary test harnesses
+test-run.html
+*_test.html
+
+# signing material — a leaked keystore means someone can ship updates as you
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+key.properties
+android/key.properties

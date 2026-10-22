@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Stack">
+  <defs>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="42" />
+    </filter>
+  </defs>
+
+  <!-- deep neutral background -->
+  <rect width="512" height="512" rx="112" fill="#0B0E13" />
+
+  <!-- soft ambient glow behind the tower -->
+  <rect x="86" y="140" width="340" height="300" rx="90" fill="#58A6FF" opacity="0.20" filter="url(#glow)" />
+
+  <!-- stacked blocks, brightest on top -->
+  <rect x="174" y="182" width="164" height="62" rx="16" fill="#8CC2FF" />
+  <rect x="138" y="260" width="236" height="62" rx="16" fill="#58A6FF" />
+  <rect x="102" y="338" width="308" height="62" rx="16" fill="#3E86E0" />
+
+  <!-- the incoming block -->
+  <rect x="208" y="112" width="96" height="54" rx="14" fill="#BEDDFF" />
+
+  <!-- motion cues -->
+  <rect x="170" y="136" width="30" height="6" rx="3" fill="#58A6FF" opacity="0.55" />
+  <rect x="312" y="136" width="30" height="6" rx="3" fill="#58A6FF" opacity="0.55" />
+</svg>
