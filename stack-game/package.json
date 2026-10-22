@@ -1,7 +1,7 @@
 {
   "name": "stack-game",
   "version": "1.0.0",
-  "description": "Stack — a fast one-tap 3D tower builder. Standalone, installable (PWA) and wrappable for Android, iOS and desktop.",
+  "description": "Stack — a fast one-tap 3D tower builder. Standalone, installable (PWA), shippable to Google Play and to desktop.",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -10,11 +10,8 @@
     "dev": "npm run build && npx --yes serve@14 www -l 4173",
     "start": "npm run build && npx --yes serve@14 www -l 4173",
     "build:android": "npm run build && npx cap sync android",
-    "build:ios": "npm run build && npx cap sync ios",
     "sync:android": "npx cap sync android",
-    "sync:ios": "npx cap sync ios",
     "open:android": "npx cap open android",
-    "open:ios": "npx cap open ios",
     "desktop:dev": "npm run build && electron .",
     "desktop:win": "npm run build && electron-builder --win",
     "desktop:mac": "npm run build && electron-builder --mac",
@@ -28,7 +25,6 @@
     "@capacitor/android": "^6.1.0",
     "@capacitor/cli": "^6.1.0",
     "@capacitor/core": "^6.1.0",
-    "@capacitor/ios": "^6.1.0",
     "electron": "^31.0.0",
     "electron-builder": "^24.13.3"
   },

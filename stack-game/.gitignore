@@ -39,3 +39,9 @@ test-run.html
 *.mobileprovision
 key.properties
 android/key.properties
+
+# machine-specific SDK paths
+local.properties
+
+# gradle build logs
+android/*.log

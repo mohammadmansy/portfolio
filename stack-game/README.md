@@ -4,13 +4,11 @@ A one-tap 3D tower builder. Each block sweeps in on an axis, you tap to drop it,
 and whatever overhangs the block below gets sliced off — so the tower drifts,
 narrows, and eventually kills you. Pure canvas, zero dependencies, ~90 KB.
 
-Same game, four ways to ship:
-
 | Target | Artefact |
 | --- | --- |
+| **Google Play** | `release/Stack-1.0-aab.aab` ← the upload file |
+| Test on a real phone | `release/Stack-1.0.apk` |
 | Web / PWA (installable, offline) | `www/` on any static host |
-| Android → **Google Play** | `app-release.aab` |
-| iOS → **App Store** | `.app` via Xcode |
 | Windows / macOS / Linux | NSIS installer, DMG, AppImage, deb |
 
 ---
@@ -21,16 +19,12 @@ Same game, four ways to ship:
 npm install
 npm run build        # validates sources + writes www/
 npm start            # http://localhost:4173
+npm run verify       # release gate, no browser needed
 ```
 
 `npm run build` refuses to produce a bundle that references a missing file, has a
 broken import, or ships an empty asset. `npm run verify` runs the same gate plus
-a staleness check — run it before every store upload.
-
-```bash
-npm run verify       # static gate, no browser needed
-npm run desktop:dev  # run the desktop shell
-```
+a staleness check — run it before every upload.
 
 ---
 
@@ -50,11 +44,13 @@ js/main.js            fixed-timestep loop + wiring
 sw.js                 offline app shell
 manifest.webmanifest  PWA manifest
 scripts/              build + release gate
+android/              ← Capacitor project, source, committed
 electron/             desktop shell (app:// protocol)
 icons/                PWA + favicon assets
 store/                Google Play listing assets
-assets/               source art for native icons (@capacitor/assets)
-www/                  ← build output, consumed by every target
+assets/               source art for native icons
+www/                  build output (git-ignored)
+release/              built AAB + APK (git-ignored)
 ```
 
 ### Tuning the game
@@ -68,14 +64,10 @@ export const DIFFICULTY = {
   cap: 1.45,         // max added (reached at ~level 32)
   tierEvery: 5       // every 5 levels: hue + glow "tier" moment
 };
-export function moveSpeedForLevel(level) {
-  return DIFFICULTY.base + Math.min(DIFFICULTY.cap, level * DIFFICULTY.perLevel);
-}
 ```
 
-`BLOCK.RANGE` is the sweep half-width (how far the block travels) and
-`BLOCK.PERFECT` is the snap tolerance in world units — widen it to be kinder,
-narrow it to be meaner.
+`BLOCK.RANGE` is the sweep half-width and `BLOCK.PERFECT` is the snap tolerance
+in world units — widen it to be kinder, narrow it to be meaner.
 
 Level design rules the game follows, worth keeping if you extend it:
 
@@ -87,12 +79,140 @@ Level design rules the game follows, worth keeping if you extend it:
   tower spiral instead of leaning one way.
 - **Slicing is axis-naive** (`min`/`max` of the two spans) — the overhang falls
   off on the axis you were sweeping, which reads correctly in isometric view.
-- **Dropping never leaves the run** if the moving block still overlaps the block
+- **Dropping never kills the run** if the moving block still overlaps the block
   below; zero overlap = crash. No random deaths.
 
 ---
 
-## 1. Web / PWA / WebGL
+## 1. Google Play
+
+### 1.1 What is already configured
+
+This repo ships a ready `android/` project. Do not regenerate it:
+
+| Setting | Value | Where |
+| --- | --- | --- |
+| Application ID | `com.mohammadmansy.stack` | `capacitor.config.json`, `app/build.gradle` |
+| Target / compile SDK | **36** (Android 16) | `android/variables.gradle` |
+| Min SDK | 23 (Android 6.0) | `android/variables.gradle` |
+| Orientation | portrait, locked | `AndroidManifest.xml` |
+| AGP / Gradle | 8.11.0 / 8.13 | `build.gradle`, `gradle-wrapper.properties` |
+| Permissions | `INTERNET` only | `AndroidManifest.xml` |
+| Release signing | keystore outside the repo | `android/key.properties` (git-ignored) |
+
+The target SDK matters: since **31 August 2026 Google Play rejects new apps
+below API 36**. Capacitor generates 34, which is why this was raised.
+
+### 1.2 Build the upload file
+
+```bash
+npm install
+npm run build:android          # web bundle + cap sync into android/
+cd android
+gradlew.bat bundleRelease      # gradlew on macOS/Linux
+```
+
+Output → `app/build/outputs/bundle/release/app-release.aab`
+
+A copy is placed in `release/Stack-1.0-aab.aab`. **That AAB is the file you
+upload to Play Console.**
+
+### 1.3 Test it on your phone first
+
+Play review rejects apps that crash, so install it locally before uploading:
+
+```bash
+gradlew.bat assembleRelease
+adb install -r app\build\outputs\apk\release\app-release.apk
+```
+
+No `adb`? Copy `release/Stack-1.0.apk` to the phone and open it (allow
+"install from unknown apps" for your file manager).
+
+Check: game starts, blocks drop on tap, sound plays, score persists after
+force-close, and rotating the phone does nothing (portrait is locked).
+
+### 1.4 Prerequisites on a fresh machine
+
+- **JDK 17+** and the **Android SDK** with `platforms;android-36`,
+  `build-tools;36.0.0` and `platform-tools`.
+- Set `JAVA_HOME`, `ANDROID_HOME` (and `ANDROID_SDK_ROOT`) — Gradle reads them.
+
+Android Studio gives you all of this in one install. The setup used to produce
+the committed build was a portable, no-admin install:
+
+```
+C:\Users\Mohamed\AppData\Local\Android\jdk17     ← Temurin JDK 17
+C:\Users\Mohamed\AppData\Local\Android\Sdk       ← cmdline-tools + platforms 36
+```
+
+`android/local.properties` points Gradle at the SDK and is git-ignored.
+
+### 1.5 Release signing — read this
+
+The keystore is **outside the repository**, at:
+
+```
+C:\Users\Mohamed\keystores\stack-release.keystore
+C:\Users\Mohamed\keystores\stack-release-passwords.txt
+```
+
+**Back both up now**, in a password manager and a second drive. They are what
+let you ship updates to an existing Play listing — losing them means you cannot
+update the app, ever. `android/key.properties` holds the same password and is
+git-ignored.
+
+Play will offer **Play App Signing** on first upload — accept it. Google then
+holds the key, so a lost local keystore stops being fatal (though you still
+need it to sign the bundle you upload).
+
+To rotate to your own keystore later:
+
+```bash
+keytool -genkeypair -v -keystore stack-release.keystore -alias stack \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
+then point `android/key.properties` at it.
+
+### 1.6 Play Console listing
+
+Everything below is generated and ready to drop in:
+
+| Asset | File | Required size |
+| --- | --- | --- |
+| App icon | `store/store-icon-512.png` | 512 × 512 PNG, opaque |
+| Feature graphic | `store/feature-graphic-1024x500.png` | 1024 × 500 |
+| Screenshots | capture on the phone | min 2, portrait |
+
+Steps:
+
+1. Play Console → **All apps → Create app** → name `Stack`, language, free,
+   type **Game**.
+2. **Testing → Internal testing** → create a release → upload the AAB. Fix
+   anything it flags before going further.
+3. **Main store listing**: title ≤ 30 chars, short description ≤ 80, full
+   description ≤ 4000, the two graphics above, 2–4 portrait screenshots.
+4. **App content → Content rating**: complete the IARC questionnaire. No
+   violence, no chat, no purchases → expect Everyone / PEGI 3.
+5. **App content → Data safety**: *no data collected, no data shared*. The game
+   stores one local value (`stack-game-v1`) in `localStorage` — device-local,
+   not collected, gone on uninstall.
+6. **App content → Privacy policy**: **required**. Host a short page anywhere
+   public and paste the URL. Say plainly: no accounts, no network calls, no
+   analytics, no ads, one local high score kept on the device.
+7. **Ads**: none — declare it.
+8. **Release → Production**, preferably a staged rollout (10% → 50% → 100%).
+
+### 1.7 Screenshots that pass
+
+Capture on a real phone, portrait, full-screen, no device chrome and no other
+apps in frame. Show: the menu, mid-run tower, a Level-Up tier moment, and game
+over with the score.
+
+---
+
+## 2. Web / PWA / WebGL
 
 `www/` is a plain static bundle — no server-side anything.
 
@@ -102,210 +222,12 @@ npm run build
 
 Upload `www/` to GitHub Pages, Netlify, itch.io, or any static host. HTTPS is
 required for the service worker and for `Add to Home Screen`; the bundle then
-works fully offline after the first load.
-
-For a sub-path host (e.g. `user.github.io/stack/`), all URLs are already
-relative, so nothing needs editing.
+works fully offline after the first load. All URLs are relative, so a sub-path
+host needs no edits.
 
 ---
 
-## 2. Android → Google Play
-
-### 2.1 Create the native project (once)
-
-```bash
-npm install
-npm run build
-npx cap add android
-```
-
-This generates `android/`. Commit it — it holds your permissions, icons and
-version code and is source, not build output.
-
-### 2.2 Meet the Play target API requirement
-
-As of **31 August 2026, new apps must target Android 16 (API 36)**. Capacitor 6
-generates `targetSdkVersion = 34`, which Play will reject. Fix it once:
-
-1. Install SDK Platform 36 in Android Studio → SDK Manager.
-2. Edit `android/variables.gradle`:
-
-```gradle
-ext {
-    minSdkVersion = 23
-    compileSdkVersion = 36
-    targetSdkVersion = 36
-    // ...
-}
-```
-
-3. If Gradle refuses to resolve 36, bump the Android Gradle Plugin to the
-   version your Android Studio ships with, in `android/build.gradle`.
-
-> Check the live requirement before every release:
-> <https://developer.android.com/google/play/requirements/target-sdk>
-
-### 2.3 Keep it portrait
-
-Play accepts either orientation, but the game is designed portrait-locked.
-In `android/app/src/main/AndroidManifest.xml`, on the `<activity>`:
-
-```xml
-android:screenOrientation="portrait"
-```
-
-### 2.4 Sync and build a bundle
-
-```bash
-npm run build:android      # build + cap sync android
-cd android
-./gradlew.bat bundleRelease    # Windows (gradlew on macOS/Linux)
-```
-
-Output: `android/app/build/outputs/bundle/release/app-release.aab`
-
-To sanity-check on a device first, use `./gradlew installRelease` or run the
-debug build from Android Studio.
-
-### 2.5 Sign it properly
-
-Never ship the debug keystore. Generate a release one (keep it and its
-passwords safe — you cannot update the app without them):
-
-```bash
-keytool -genkey -v -keystore stack-release.keystore -alias stack \
-  -keyalg RSA -keysize 2048 -validity 10000
-```
-
-Create `android/key.properties` (git-ignored by Capacitor's template):
-
-```properties
-storeFile=C:/path/to/stack-release.keystore
-storePassword=YOUR_STORE_PASSWORD
-keyAlias=stack
-keyPassword=YOUR_KEY_PASSWORD
-```
-
-Then wire it into `android/app/build.gradle`:
-
-```gradle
-def keystorePropertiesFile = rootProject.file("key.properties")
-def keystoreProperties = new Properties()
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
-
-android {
-    signingConfigs {
-        release {
-            if (keystorePropertiesFile.exists()) {
-                storeFile file(keystoreProperties["storeFile"])
-                storePassword keystoreProperties["storePassword"]
-                keyAlias keystoreProperties["keyAlias"]
-                keyPassword keystoreProperties["keyPassword"]
-            }
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig keystorePropertiesFile.exists()
-                ? signingConfigs.release
-                : signingConfigs.debug
-        }
-    }
-}
-```
-
-Play App Signing: when you first upload, Play will ask you to enrol. Let it —
-Google holds the key and re-signs for you, so a lost keystore is no longer fatal.
-
-### 2.6 Play Console listing
-
-Everything below is generated or ready to drop in:
-
-| Asset | File |
-| --- | --- |
-| App icon, 512×512 PNG, opaque | `store/store-icon-512.png` |
-| Feature graphic, 1024×500 | `store/feature-graphic-1024x500.png` |
-| Screenshots (min 2, phone) | capture from a real device |
-
-Steps:
-
-1. Pay the one-time $25 developer fee.
-2. **All apps → Create app** → name `Stack`, language, free, app (not game is
-   wrong — pick *Game*).
-3. **Testing → Internal testing** → upload the AAB. Fix anything it flags.
-4. **Main store listing**: title (≤30 chars), short description (≤80), full
-   description (≤4000), the two graphics above, 2–4 phone screenshots.
-5. **App content → Content rating**: complete the IARC questionnaire. This game
-   has no violence, no chat, no purchases → expect Everyone / PEGI 3.
-6. **App content → Data safety**: *no data collected, no data shared*. The game
-   stores only a local high score in `localStorage` — that is device-local and
-   not collected.
-7. **App content → Privacy policy**: **required**. Host a short page anywhere
-   public and paste the URL. Say plainly: no accounts, no network calls, no
-   analytics, one local value (`stack-game-v1`) kept on the device, cleared by
-   uninstalling.
-8. **Ads**: none. Declare it.
-9. **Release → Production**, ideally a staged rollout (10% → 50% → 100%) so a
-   bad build only reaches part of your audience.
-
-Review typically takes hours to a few days for a first submission.
-
-### 2.7 Screenshots that pass
-
-Capture on a real phone or emulator at 1080×1920 or taller, portrait. Show:
-menu screen, mid-run tower, a Level-Up tier moment, game over with the score.
-No device chrome, no letterboxing, no other apps in frame.
-
----
-
-## 3. iOS → App Store
-
-Requires macOS with a current Xcode.
-
-```bash
-npm install
-npm run build
-npx cap add ios
-npm run build:ios
-npm run open:ios
-```
-
-### Native app icons
-
-Apple requires a 1024×1024 PNG with **no transparency**. It is already in the
-repo, and `@capacitor/assets` expands it into every iOS/Android size:
-
-```bash
-npm install -D @capacitor/assets
-npx @capacitor/assets generate --ios --android
-```
-
-### Orientation and safe area
-
-In Xcode, target → *General* → *Supported orientations*: **Portrait only**.
-The game already respects `viewport-fit=cover` and the safe-area insets, so it
-sits correctly under the Dynamic Island.
-
-### Signing and upload
-
-1. Apple Developer account ($99/year) → create an App ID `com.mohammadmansy.stack`
-   (matches `capacitor.config.json`).
-2. In Xcode, set your Team under *Signing & Capabilities*. Automatic signing
-   handles the rest.
-3. *Product → Archive* → *Distribute App* → App Store Connect.
-4. In App Store Connect: app name, subtitle, screenshots (6.7" display
-   recommended), description, keywords, privacy policy URL, age rating
-   questionnaire, and the App Privacy report (*no data collected*).
-5. Submit for review.
-
-If you do not own a Mac, rent one (MacinCloud, GitHub-hosted macOS runner, or
-CircleCI macOS) just for the Archive step.
-
----
-
-## 4. Desktop
+## 3. Desktop
 
 ```bash
 npm run desktop:dev      # run un-packaged
@@ -318,6 +240,9 @@ The Electron shell serves `www/` over a privileged `app://` scheme — `file://`
 is avoided on purpose because Chromium blocks ES module imports there, which is
 exactly how the game is written. F11 toggles fullscreen.
 
+> Electron's binary download is skipped by npm's script allow-list on first
+> install. Run `npm approve-scripts electron` before `desktop:*`.
+
 Icons resolve automatically: `icons/icon.ico` for Windows, `icons/icon-512.png`
 for macOS and Linux.
 
@@ -328,12 +253,13 @@ for macOS and Linux.
 Before any upload:
 
 - [ ] `npm run verify` passes
-- [ ] version bumped in `package.json`
-- [ ] `versionCode` / `versionName` bumped in `android/app/build.gradle`
-- [ ] `CACHE` bumped in `sw.js` (`'stack-v1'` → `'stack-v2'`) — otherwise
-      returning web players keep the old bundle
-- [ ] target API level still meets the current Play minimum
-- [ ] store graphics refreshed if the visuals changed
+- [ ] `versionCode` **incremented** in `android/app/build.gradle` (Play rejects
+      an upload that reuses a version code you already shipped)
+- [ ] `versionName` updated to match
+- [ ] `CACHE` bumped in `sw.js` (`'stack-v1'` → `'stack-v2'`) so returning web
+      players stop getting the old bundle
+- [ ] rebuilt: `npm run build:android` then `gradlew.bat bundleRelease`
+- [ ] installed on a real device and played a full run
 
 ---
 

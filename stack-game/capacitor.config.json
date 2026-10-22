@@ -2,7 +2,6 @@
   "appId": "com.mohammadmansy.stack",
   "appName": "Stack",
   "webDir": "www",
-  "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https",
     "iosScheme": "capacitor"
@@ -11,11 +10,6 @@
     "allowMixedContent": false,
     "captureInput": true,
     "webContentsDebuggingEnabled": false
-  },
-  "ios": {
-    "contentInset": "never",
-    "allowsLinkPreview": false,
-    "preferredContentMode": "mobile"
   },
   "plugins": {
     "SplashScreen": {
