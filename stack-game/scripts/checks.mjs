@@ -10,11 +10,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 const JS_EXT = new Set(['.js', '.mjs', '.cjs']);
+
+/* The i18n table lives in an ES module that reads localStorage, so give
+   Node a stub before importing it. Top-level await is fine: this module
+   is only ever imported by other ES modules. */
+const noopStore = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+if (!globalThis.window) globalThis.window = { localStorage: noopStore };
+const i18nMod = await import(pathToFileURL(path.join(ROOT, 'js', 'i18n.js')).href);
+
+/* Keys that are allowed to read the same in every language (brand names,
+   which are deliberately not translated). */
+const I18N_SHARED_OK = new Set(['brand']);
 
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -200,6 +211,67 @@ export function runChecks() {
     }
   } catch (e) {
     errors.push(`package.json is not valid JSON: ${e.message}`);
+  }
+
+  /* ---------- 8. every translation key must resolve in every language ---------- */
+  {
+    const keys = new Set();
+
+    // keys bound in the shell
+    if (fs.existsSync(htmlPath)) {
+      for (const m of htmlForTheme.matchAll(/data-i18n(?:-aria)?="([^"]+)"/g)) keys.add(m[1]);
+    }
+    // keys asked for at runtime: t('key') / t("key") / t('key', {...})
+    for (const file of sourceFiles('js', new Set(['.js']))) {
+      const src = fs.readFileSync(file, 'utf8');
+      for (const m of src.matchAll(/\bt\(\s*['"]([A-Za-z0-9_]+)['"]/g)) keys.add(m[1]);
+    }
+
+    if (keys.size === 0) {
+      warnings.push('no translation keys found — i18n wiring looks disconnected');
+    } else {
+      i18nMod.setLanguage('en');
+      for (const key of keys) {
+        const en = i18nMod.t(key);
+        i18nMod.setLanguage('ar');
+        const ar = i18nMod.t(key);
+        i18nMod.setLanguage('en');
+
+        if (en === key) errors.push(`i18n key "${key}" is missing from the English table`);
+        else if (ar === key) errors.push(`i18n key "${key}" is missing from the Arabic table`);
+        else if (ar === en && !I18N_SHARED_OK.has(key)) {
+          errors.push(`i18n key "${key}" is identical in English and Arabic — untranslated`);
+        }
+      }
+    }
+  }
+
+  /* ---------- 9. every imported module must be precached for offline ---------- */
+  // A module missing from the SW list loads fine online and then throws
+  // on a cold offline start — the worst place to find out.
+  {
+    const swPath = path.join(ROOT, 'sw.js');
+    if (fs.existsSync(swPath) && fs.existsSync(htmlPath)) {
+      const sw = fs.readFileSync(swPath, 'utf8');
+      const precached = new Set();
+      for (const m of sw.matchAll(/["'](\.\/[^"']*)["']/g)) {
+        precached.add(m[1].replace(/^\.\//, ''));
+      }
+      precached.add('index.html');
+
+      const needed = new Set(['index.html']);
+      for (const file of sourceFiles('js', new Set(['.js']))) {
+        const src = fs.readFileSync(file, 'utf8');
+        for (const m of src.matchAll(/\bfrom\s*["'](\.{1,2}\/[^"']+)["']/g)) {
+          needed.add(path.relative(ROOT, path.resolve(path.dirname(file), m[1])).replace(/\\/g, '/'));
+        }
+      }
+      for (const need of needed) {
+        if (!precached.has(need)) {
+          errors.push(`sw.js does not precache "${need}" — offline play would break`);
+        }
+      }
+    }
   }
 
   return { errors, warnings };

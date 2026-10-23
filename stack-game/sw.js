@@ -6,7 +6,7 @@
    Bump CACHE on every release that changes any core asset.
    ============================================================ */
 
-const CACHE = 'stack-v1';
+const CACHE = 'stack-v2';
 
 const CORE = [
   './',
@@ -15,6 +15,7 @@ const CORE = [
   './manifest.webmanifest',
   './js/config.js',
   './js/storage.js',
+  './js/i18n.js',
   './js/audio.js',
   './js/input.js',
   './js/renderer.js',

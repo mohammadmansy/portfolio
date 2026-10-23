@@ -27,7 +27,6 @@ export const DEBRIS = {
   GRAVITY: 20,       // world units / s^2
   LIFT_MIN: 0.4,
   LIFT_MAX: 0.8,
-  LIFE: 1,           // seconds before a piece is culled
   FADE: 0.42
 };
 
@@ -56,6 +55,30 @@ export const DIFFICULTY = {
   // A "tier" milestone every N levels (drives the Level Up celebration)
   tierEvery: 5
 };
+
+/* ---------- crash feel ---------- */
+
+// How long the world keeps settling after a crash before it freezes
+// solid. Long enough for the shattered pieces to read, short enough
+// that it never feels like the game is still running behind the panel.
+export const SETTLE_MS = 700;
+
+// The UI waits this long after the crash before sliding the game-over
+// panel in — just after the world freezes, so the player actually sees
+// the tower break and nothing keeps moving behind the panel.
+export const GAME_OVER_DELAY_MS = 720;
+
+// The failed block shatters into this many chunks along its sweep axis.
+export const CRASH_CHUNKS = 3;
+
+// Lateral kick given to each crash chunk (world units / second at the
+// outer edge).
+export const CRASH_SPREAD = 1.5;
+
+// How many of the topmost blocks keep the expensive glow edge. Every
+// block used to run a shadowBlur stroke, which is the single most
+// costly canvas operation; the eye only tracks the top of the tower.
+export const GLOW_TOP_BLOCKS = 5;
 
 export function moveSpeedForLevel(level) {
   return DIFFICULTY.base + Math.min(DIFFICULTY.cap, level * DIFFICULTY.perLevel);

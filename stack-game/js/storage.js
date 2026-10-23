@@ -8,8 +8,11 @@ import { STORAGE_KEY } from './config.js';
 
 const DEFAULTS = {
   best: 0,
+  bestStreak: 0,
   sound: true,
-  haptics: true
+  haptics: true,
+  lang: '',        // '' = auto-detect from the browser
+  seenHowTo: false
 };
 
 let cache = null;
@@ -42,8 +45,11 @@ export function save(patch) {
   cache = Object.assign({}, load(), patch || {});
   writeRaw({
     best: cache.best,
+    bestStreak: cache.bestStreak,
     sound: cache.sound,
-    haptics: cache.haptics
+    haptics: cache.haptics,
+    lang: cache.lang,
+    seenHowTo: cache.seenHowTo
   });
   return cache;
 }
@@ -56,6 +62,19 @@ export function setBest(score) {
   const cur = load().best;
   if (score > cur) {
     save({ best: score });
+    return true;
+  }
+  return false;
+}
+
+export function getBestStreak() {
+  return load().bestStreak;
+}
+
+export function setBestStreak(n) {
+  const cur = load().bestStreak;
+  if (n > cur) {
+    save({ bestStreak: n });
     return true;
   }
   return false;
@@ -75,4 +94,24 @@ export function isHapticsOn() {
 
 export function setHapticsOn(on) {
   save({ haptics: !!on });
+}
+
+export function getLangPref() {
+  return load().lang;
+}
+
+export function setLangPref(code) {
+  save({ lang: code || '' });
+}
+
+export function hasSeenHowTo() {
+  return load().seenHowTo;
+}
+
+export function markSeenHowTo() {
+  save({ seenHowTo: true });
+}
+
+export function resetProgress() {
+  save({ best: 0, bestStreak: 0 });
 }

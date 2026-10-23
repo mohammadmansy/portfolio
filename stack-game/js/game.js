@@ -1,21 +1,27 @@
 /* ============================================================
    Stack — core game logic
-   Pure simulation: no DOM, no rendering, no audio. This file
-   owns the world state, the state machine and the rules. It is
-   driven from main.js, which handles timing and the frame loop,
-   so the whole simulation can be tested headlessly.
+   Pure simulation: no rendering, no audio. This file owns the
+   world state, the state machine and the rules. It is driven from
+   main.js, which handles timing and the frame loop, so the whole
+   simulation can be tested headlessly.
 
    Loop structure:
      Menu → Playing → Paused (resume) → Game Over → Menu
                           ↓ (visibility loss)
                        Paused (auto)
+
+   After a crash the world keeps settling for SETTLE_MS so the
+   shattered pieces read, then freezes solid — nothing should keep
+   moving behind the game-over panel.
    ============================================================ */
 
 import {
-  BLOCK, DEBRIS, PARTICLE, RING, CAMERA, DIFFICULTY,
+  BLOCK, DEBRIS, PARTICLE, RING, DIFFICULTY,
+  SETTLE_MS, CRASH_CHUNKS, CRASH_SPREAD,
   moveSpeedForLevel
 } from './config.js';
-import { setBest, getBest } from './storage.js';
+import { setBest, getBest, setBestStreak, getBestStreak } from './storage.js';
+import { t } from './i18n.js';
 
 export const STATE = {
   MENU: 'menu',
@@ -39,6 +45,7 @@ export class Game {
 
     this.level = 1;
     this.combo = 0;
+    this.bestStreak = 0;
     this.score = 0;
     this.flash = 0;
     this.perfMsg = null;
@@ -53,7 +60,11 @@ export class Game {
     this.lastTier = 0;
     this.tierFlash = 0;
 
-    // callbacks wired by ui.js
+    // post-crash settle window; > 0 keeps physics alive while the
+    // state is already OVER, then everything freezes
+    this.settleMs = 0;
+
+    // callbacks wired by ui.js / main.js
     this.onScoreChange = null;
     this.onBestChange = null;
     this.onLevelUp = null;
@@ -69,11 +80,13 @@ export class Game {
     this.rings = [];
     this.level = 1;
     this.combo = 0;
+    this.bestStreak = 0;
     this.score = 0;
     this.flash = 0;
     this.perfMsg = null;
     this.tierFlash = 0;
     this.lastTier = 0;
+    this.settleMs = 0;
     this.focusY = this.level - 0.9;
     this.focusTarget = this.level - 0.9;
     this.renderer.focusY = this.focusY;
@@ -98,10 +111,30 @@ export class Game {
 
   toMenu() {
     this.state = STATE.MENU;
+    this.settleMs = 0;
+    this.moving = null;
   }
 
   isPlaying() {
     return this.state === STATE.PLAYING;
+  }
+
+  /**
+   * True while anything on screen is still moving or fading. The
+   * frame loop uses this to skip rendering entirely on static
+   * screens, which is what keeps the menus at ~0% CPU.
+   *
+   * Deliberately does NOT look at debris / particle counts: those
+   * only move while the simulation is stepping them, so a paused
+   * world or a settled crash must count as still.
+   */
+  isAnimating() {
+    if (this.state === STATE.PLAYING) return true;
+    if (this.settleMs > 0) return true;
+    if (this.flash > 0 || this.tierFlash > 0) return true;
+    if (this.perfMsg) return true;
+    if (this.renderer.shake > 0) return true;
+    return false;
   }
 
   /* ---------- spawning ---------- */
@@ -212,10 +245,11 @@ export class Game {
       // snap exactly onto the block below and keep full size
       if (axis === 'x') placed.x = pc; else placed.z = pc;
       this.combo += 1;
+      if (this.combo > this.bestStreak) this.bestStreak = this.combo;
       this.flash = 1;
       this.perfMsg = {
         t: 1,
-        text: this.combo > 1 ? 'PERFECT \u00d7' + this.combo : 'PERFECT'
+        text: this.combo > 1 ? t('perfectCombo', { n: this.combo }) : t('perfect')
       };
       this.burst(placed);
       this.puff(placed);
@@ -234,10 +268,15 @@ export class Game {
       const piece = {
         x: placed.x, z: placed.z,
         sx: placed.sx, sz: placed.sz,
-        y: placed.y, vy: 0, life: 1
+        y: placed.y, vy: 0, vx: 0, vz: 0, life: 1
       };
-      if (axis === 'x') { piece.x = cutCenter; piece.sx = cutSize; }
-      else { piece.z = cutCenter; piece.sz = cutSize; }
+      if (axis === 'x') {
+        piece.x = cutCenter; piece.sx = cutSize;
+        piece.vx = (cutCenter > pc ? 1 : -1) * 0.55;
+      } else {
+        piece.z = cutCenter; piece.sz = cutSize;
+        piece.vz = (cutCenter > pc ? 1 : -1) * 0.55;
+      }
       piece.vy = DEBRIS.LIFT_MIN + Math.random() * (DEBRIS.LIFT_MAX - DEBRIS.LIFT_MIN);
       this.debris.push(piece);
 
@@ -260,25 +299,61 @@ export class Game {
     return perfect ? 'perfect' : 'placed';
   }
 
-  crash() {
+  /** Break the failed block into chunks that scatter and fall. */
+  shatter() {
     const m = this.moving;
-    if (m) {
-      this.debris.push({
+    if (!m) return;
+    const axis = m.axis;
+    const n = CRASH_CHUNKS;
+    const size = axis === 'x' ? m.sx : m.sz;
+    const centre = axis === 'x' ? m.x : m.z;
+
+    for (let i = 0; i < n; i++) {
+      const frac = (i + 0.5) / n;              // 0..1 across the block
+      const piece = {
         x: m.x, z: m.z, sx: m.sx, sz: m.sz,
-        y: m.y, vy: DEBRIS.LIFT_MIN + 0.2, life: 1
-      });
+        y: m.y,
+        vy: DEBRIS.LIFT_MIN + Math.random() * (DEBRIS.LIFT_MAX - DEBRIS.LIFT_MIN),
+        vx: 0, vz: 0, life: 1
+      };
+      // small gap between chunks so they read as separate pieces
+      const chunk = (size / n) * 0.9;
+      const offset = (frac - 0.5) * size;
+      if (axis === 'x') {
+        piece.x = centre + offset;
+        piece.sx = chunk;
+        piece.vx = (frac - 0.5) * CRASH_SPREAD * 2;
+      } else {
+        piece.z = centre + offset;
+        piece.sz = chunk;
+        piece.vz = (frac - 0.5) * CRASH_SPREAD * 2;
+      }
+      this.debris.push(piece);
     }
+  }
+
+  crash() {
+    this.shatter();
     this.moving = null;
     this.state = STATE.OVER;
+    this.perfMsg = null;
+    this.settleMs = SETTLE_MS;
     this.renderer.triggerShake();
 
+    // persist meta stats even though the run is over
+    if (this.bestStreak > 0) setBestStreak(this.bestStreak);
     if (this.score > this.best) {
       this.best = this.score;
       setBest(this.best);
       if (this.onBestChange) this.onBestChange(this.best);
     }
 
-    if (this.onGameOver) this.onGameOver(this.score, this.best);
+    if (this.onGameOver) {
+      this.onGameOver(this.score, this.best, {
+        record: this.score > 0 && this.score >= this.best,
+        streak: this.bestStreak
+      });
+    }
   }
 
   /** Fire a celebration every DIFFICULTY.tierEvery levels. */
@@ -307,6 +382,34 @@ export class Game {
       this.placeMoving();
     }
 
+    // crash settle window: keeps debris / particles alive for a beat
+    // after the run ends, then freezes everything for good
+    let settling = false;
+    if (this.settleMs > 0) {
+      this.settleMs = Math.max(0, this.settleMs - dtMs);
+      settling = this.settleMs > 0;
+      if (!settling) {
+        // the beat is over — clear anything still in flight so the
+        // scene behind the game-over panel is perfectly still
+        this.debris.length = 0;
+        this.particles.length = 0;
+        this.rings.length = 0;
+      }
+    }
+
+    // nothing may keep moving once the run is over and settled, or
+    // while paused — that motion behind the panel is the bug
+    const live = this.state === STATE.PLAYING || settling;
+    if (!live) {
+      // freeze the transient effects too: a stuck PERFECT banner or
+      // a half-decayed flash would read as motion on a static screen
+      this.flash = 0;
+      this.tierFlash = 0;
+      this.perfMsg = null;
+      this.renderer.shake = 0;
+      return;
+    }
+
     // camera follow (frame-rate independent smoothing)
     this.focusY += (this.focusTarget - this.focusY) * Math.min(1, dtMs / 140);
     this.renderer.focusY = this.focusY;
@@ -324,6 +427,8 @@ export class Game {
     for (let i = this.debris.length - 1; i >= 0; i--) {
       const d = this.debris[i];
       d.vy -= DEBRIS.GRAVITY * s;
+      d.x += d.vx * s;
+      d.z += d.vz * s;
       d.y += d.vy * s;
       d.life -= s * DEBRIS.FADE;
       if (d.y < this.focusY - 12 || d.life <= 0) this.debris.splice(i, 1);

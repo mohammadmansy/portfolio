@@ -2,7 +2,10 @@
 
 A one-tap 3D tower builder. Each block sweeps in on an axis, you tap to drop it,
 and whatever overhangs the block below gets sliced off — so the tower drifts,
-narrows, and eventually kills you. Pure canvas, zero dependencies, ~90 KB.
+narrows, and eventually kills you. Pure canvas, zero dependencies, ~136 KB.
+
+English and العربية (full RTL), with a title screen, a first-run tutorial,
+settings, pause and a game-over panel with a new-record celebration.
 
 | Target | Artefact |
 | --- | --- |
@@ -35,11 +38,12 @@ index.html            shell: canvas, HUD, overlays
 css/game.css          tokens + layout (mobile-first, safe-area aware)
 js/config.js          ← all tuning lives here
 js/game.js            simulation + state machine (MENU/PLAYING/PAUSED/OVER)
-js/renderer.js        isometric software renderer, painter's sort
+js/renderer.js        isometric software renderer, painter's order
 js/input.js           pointer + keyboard, one action = drop
 js/audio.js           Web Audio SFX (no audio files to ship)
-js/storage.js         localStorage wrapper
-js/ui.js              overlays, HUD, toggles
+js/storage.js         localStorage wrapper (best, streak, sound, lang)
+js/i18n.js            English / العربية strings + RTL document wiring
+js/ui.js              screen system: title, how-to, settings, pause, over
 js/main.js            fixed-timestep loop + wiring
 sw.js                 offline app shell
 manifest.webmanifest  PWA manifest
@@ -69,6 +73,18 @@ export const DIFFICULTY = {
 `BLOCK.RANGE` is the sweep half-width and `BLOCK.PERFECT` is the snap tolerance
 in world units — widen it to be kinder, narrow it to be meaner.
 
+The crash beat lives in the same file:
+
+```js
+export const SETTLE_MS = 700;        // debris scatters for this long, then freezes
+export const GAME_OVER_DELAY_MS = 720; // panel slides in just after the freeze
+export const CRASH_CHUNKS = 3;       // pieces the failed block breaks into
+```
+
+To add a language, add a table to `js/i18n.js` and its code to `LANGS`.
+`npm run build` fails if any key is missing from a table or left
+untranslated, so a half-finished language can never ship.
+
 Level design rules the game follows, worth keeping if you extend it:
 
 - **Physics runs on a fixed 120 Hz timestep** (`main.js`), so a 60 Hz phone and
@@ -81,6 +97,17 @@ Level design rules the game follows, worth keeping if you extend it:
   off on the axis you were sweeping, which reads correctly in isometric view.
 - **Dropping never kills the run** if the moving block still overlaps the block
   below; zero overlap = crash. No random deaths.
+- **A crash shatters, then freezes.** The block breaks into `CRASH_CHUNKS`
+  pieces that scatter for `SETTLE_MS`, then everything still in flight is
+  cleared and the world stops. The game-over panel waits
+  `GAME_OVER_DELAY_MS` — just after that freeze — so nothing ever moves
+  behind it. Pausing freezes the world the same way.
+- **Rendering is on demand.** `game.isAnimating()` is false on every static
+  screen, so the frame loop skips the paint entirely. Menus and the paused
+  game sit at ~0% CPU instead of redrawing 60 times a second.
+- **The renderer is the hot path**, so it caches per-level colours, never
+  allocates inside the loop, and spends `shadowBlur` only on the top few
+  blocks and the moving one.
 
 ---
 
